@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.LxVisitInviteMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.LxVisitInvite" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    <result column="gw_id" property="gwId" jdbcType="BIGINT" />
+    <result column="appointment_time" property="appointmentTime" jdbcType="TIMESTAMP" />
+    <result column="appointment_memo" property="appointmentMemo" jdbcType="VARCHAR" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    
+    <result column="visit_time" property="visitTime" jdbcType="TIMESTAMP" />
+    <result column="visit_memo" property="visitMemo" jdbcType="VARCHAR" />
+    <result column="visit_creator" property="visitCreator" jdbcType="BIGINT" />
+    <result column="visit_created" property="visitCreated" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  
+  <resultMap id="VOResultMap" type="com.niu.crm.vo.LxVisitInviteVO" extends="BaseResultMap">
+  	<result column="company_id" property="companyId" jdbcType="BIGINT" />
+  	<result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+  	<result column="cstm_name" property="cstmName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    a.id, a.stu_id, a.gw_id, a.appointment_time,  a.appointment_memo, 
+    a.creator_id, a.created_at, 
+    a.visit_time, a.visit_memo, a.visit_creator, a.visit_created
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.LxVisitInvite" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into lx_visit_invite (
+          stu_id, gw_id,     appointment_time,   appointment_memo,   creator_id, created_at
+    )
+    values (
+        #{stuId}, #{gwId}, #{appointmentTime}, #{appointmentMemo}, #{creatorId}, #{createdAt}
+    )
+  </insert>
+  <update id="updateInvite" parameterType="com.niu.crm.model.LxVisitInvite" >
+    update lx_visit_invite
+       set appointment_time=#{appointmentTime},  
+           appointment_memo = #{appointmentMemo}
+     where id = #{id}
+  </update>
+  
+  <update id="updateVisit" parameterType="com.niu.crm.model.LxVisitInvite" >
+    update lx_visit_invite
+       set visit_time = #{visitTime},  
+           visit_memo = #{visitMemo},
+           visit_creator = #{visitCreator},
+           visit_created = #{visitCreated}
+     where id = #{id}
+  </update>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from lx_visit_invite where id = #{id}
+  </delete>
+  
+  <select id="selectByPrimaryKey" resultMap="VOResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />, b.cstm_id, b.company_id, c.name as cstm_name
+      from lx_visit_invite a, t_lx_customer b, t_customer c
+     where a.stu_id=b.id and b.cstm_id=c.id and a.id = #{id}
+  </select>
+  
+  <sql id="queryClause">
+  	 from lx_visit_invite a, t_lx_customer b, t_customer c
+    where a.stu_id=b.id and b.cstm_id=c.id 
+    <if test="params.companyId != null" >
+      and b.company_id = #{params.companyId}
+    </if>
+    <if test="params.cstmName != null and params.cstmName != '' " >
+      and c.name like #{params.cstmName}
+    </if>
+    <if test="params.gwName != null and params.gwName != '' " >
+      and exists (
+         select * from t_user where id=a.gw_id and name like #{params.gwName} 
+      )
+    </if>
+    <if test="params.appointmentFrom != null" >
+    	<![CDATA[
+      and a.appointment_time >= #{params.appointmentFrom}
+      ]]>
+    </if>
+    <if test="params.appointmentTo != null" >
+    	<![CDATA[
+      and a.appointment_time <= #{params.appointmentTo}
+      ]]>
+    </if>
+    
+    <if test="params.visitFrom != null" >
+    	<![CDATA[
+      and a.visit_time >= #{params.visitFrom}
+      ]]>
+    </if>
+    <if test="params.visitTo != null" >
+    	<![CDATA[
+      and a.visit_time <= #{params.visitTo}
+      ]]>
+    </if>
+    
+    <if test="params.aclClause != null and params.aclClause !='' " >
+      ${params.aclClause}
+    </if>
+  </sql>  
+  
+  <select id="countInvite" resultType="Integer">
+    select count(*) 
+    <include refid="queryClause"/>
+  </select>
+  
+  <select id="queryInvite" resultMap="VOResultMap" >
+    select 
+    <include refid="Base_Columns" />, b.cstm_id, b.company_id, c.name as cstm_name
+    <include refid="queryClause"/>
+    
+    <if test="pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager.sort ==null">
+		order by a.created_at desc
+	</if>		
+	limit #{pager.offset}, #{pager.size}
+  </select>
+  
+  <select id="selectByStuId" resultMap="VOResultMap" >
+    select 
+    <include refid="Base_Columns" />, b.cstm_id, b.company_id, c.name as cstm_name
+    from lx_visit_invite a, t_lx_customer b, t_customer c
+    where a.stu_id=c.id and b.cstm_id=c.id and a.stu_id = #{stuId}
+    order by a.appointment_time 
+  </select>
+</mapper>  

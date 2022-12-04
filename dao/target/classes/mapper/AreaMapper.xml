@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.AreaMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.Area" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="abbr" property="abbr" jdbcType="VARCHAR" />
+    <result column="show_index" property="showIndex" jdbcType="BIGINT" />
+    <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+    <result column="zip_code" property="zipCode" jdbcType="VARCHAR" />
+    <result column="zone_tag" property="zoneTag" jdbcType="BIGINT" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, name, abbr, show_index, parent_id, zip_code, zone_tag, creator_id, created_at
+  </sql>
+  
+  
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_area
+    where id = #{id}
+  </select>
+
+  <select id="selectChildren" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_area
+    where 
+    <if test="parentId != null" >
+       parent_id = #{parentId}
+    </if>
+    <if test="parentId == null" >
+       parent_id is null
+    </if>
+      order by show_index, id
+  </select>
+  
+</mapper>  

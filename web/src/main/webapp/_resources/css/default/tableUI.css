@@ -1,0 +1,79 @@
+a{text-decoration:none;font-size:12px;}
+a:hover{text-decoration:underline;color:#0E2D5F}
+.digit_prompt{color:red; font-size:18px; font-weight: bold;}
+.text_prompt{color:red;}
+.no_record{color:red;font-weight: bold; font-size: 15px; text-align: center;}
+.error_msg{color:red;font-weight: bold; font-size: 15px; text-align: center;}
+.record_body{padding:2px; border: 0px;} 
+.more_record{text-align: right;display: none;}
+.todo_confirm {background: url('/images/todo/confirm.png') no-repeat center center;}
+.todo_next {background: url('/images/todo/next.png') no-repeat center center;}
+.todo_message {background: url('/images/todo/message.png') no-repeat center center;}
+.todo_biz {background: url('/images/todo/biz.png') no-repeat center center;}
+.todo_callback {background: url('/images/todo/callback.png') no-repeat center center;}
+.message_read {background: url('/images/todo/read.png') no-repeat center center;}
+.message_unread {background: url('/images/todo/unread.png') no-repeat center center;}
+.todo_setup {background: url('/images/todo/setup.png') no-repeat center center;}
+
+.listTable{ 
+  border-collapse: collapse; 
+  border-left:1px solid #ccc;
+  border-top:1px solid #ccc;
+}
+ 	
+.listTable tr{}
+
+.listTable tr.hd td,th {
+	overflow:hidden;
+	padding-left:0px;	
+	padding-right:1px;
+	font-size:9pt;
+	color:#333;
+	border-style:solid;
+	border-color:#ccc;
+	border-width:0 1px 1px 0;
+	border-top:1px solid #ccc;
+	background-color:#F2F2F2;
+	background: -webkit-linear-gradient(top,#ffffff 0,#F2F2F2 100%);
+  background: -moz-linear-gradient(top,#ffffff 0,#F2F2F2 100%);
+  background: -o-linear-gradient(top,#ffffff 0,#F2F2F2 100%);
+  background: linear-gradient(to bottom,#ffffff 0,#F2F2F2 100%);
+  background-repeat: repeat-x;
+	text-align:center;
+	vertical-align:middle;
+}
+
+.listTable td {
+	height:22px;
+	padding:0 1px;overflow:hidden;
+	background-color:#fff;
+	font-size:9pt;
+	font-family:ËÎÌו;
+	border-bottom:1px solid #ccc;border-right:1px solid #ccc;
+} 
+
+.listTable tr td.date {
+	font-size:9pt;
+}
+
+.listTable tr.trList0 td {
+	background-color:#FFFFFF;
+}
+
+.listTable tr.trList1 td {
+	background-color:#f0f2eb; 
+} 
+
+.listTable td.detailTitle { 
+	font-size: 9pt;
+	FONT-WEIGHT: bold;
+	background-color:#EDF8FE;
+	font-family:ËÎÌו;
+	line-height: 15pt
+}
+
+.trMouseOver td {
+	background-color:#B5D7BD; 
+}
+
+tr.virtual td{height:0.1px;border:none}

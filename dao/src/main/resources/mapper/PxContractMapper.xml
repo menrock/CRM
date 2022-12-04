@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.PxContractMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.PxContract" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="con_id" property="conId" jdbcType="BIGINT" />
+    <result column="con_type" property="conType" jdbcType="BIGINT" />
+    <result column="country_codes" property="countryCodes" jdbcType="VARCHAR" />
+    <result column="country_names" property="countryNames" jdbcType="VARCHAR" />
+    <result column="plan_enter_year" property="planEnterYear" jdbcType="INTEGER" />
+    <result column="plan_enter_season" property="planEnterSeason" jdbcType="VARCHAR" />
+    
+    <result column="con_value" property="conValue" jdbcType="DECIMAL" />
+    <result column="con_discount" property="conDiscount" jdbcType="DECIMAL" />
+    <result column="sk_value" property="skValue" jdbcType="DECIMAL" />
+    <result column="first_sk_date" property="firstSkDate" jdbcType="TIMESTAMP" />
+    <result column="sign_gw_id" property="signGwId" jdbcType="BIGINT" />
+    <result column="plan_gw_id" property="planGwId" jdbcType="BIGINT" />
+    <result column="apply_gw_id" property="applyGwId" jdbcType="BIGINT" />
+    <result column="write_gw_id" property="writeGwId" jdbcType="BIGINT" />
+    <result column="service_gw_id" property="serviceGwId" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+  </resultMap>  
+  
+  <resultMap id="DTOResultMap" type="com.niu.crm.dto.PxContractDTO" extends="BaseResultMap">
+    <result column="cstm_name" property="cstmName" jdbcType="VARCHAR" />
+    <result column="con_no" property="conNo" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    c.id, c.con_id, c.country_codes, c.country_names, c.plan_enter_year, c.plan_enter_season,
+    c.con_value,    c.con_discount,  c.sk_value, c.first_sk_date, 
+    c.sign_gw_id,   c.plan_gw_id,    c.apply_gw_id, 
+    c.write_gw_id,  c.service_gw_id, c.company_id, c.status, c.memo
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.LxContract" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_px_contract (
+    		con_id,    con_type,   country_codes, country_names, plan_enter_year, plan_enter_season,
+    		con_value, con_discount,  
+    		plan_gw_id, apply_gw_id, write_gw_id, service_gw_id,   
+            company_id, memo,  status)
+    values (
+       #{stuId},    #{conType},   #{conNo}, #{countryCodes}, #{countryNames}, #{planEnterYear}, #{planEnterSeason},
+       #{conValue}, #{conDiscount}, 
+       #{signGwId}, #{planGwId},  #{applyGwId}, #{writeGwId}, #{serviceGwId}, 
+       #{signDate}, #{companyId}, #{memo}, #{status}, #{creatorId}, now() )
+  </insert>
+  <update id="update" parameterType="com.niu.crm.model.PxContract" >
+    update t_px_contract
+       set con_type = #{conType}, 
+           country_codes = #{countryCodes}, 
+           country_names = #{countryNames}, 
+           plan_enter_year = #{planEnterYear}, 
+           plan_enter_season = #{planEnterSeason},
+       	   con_value= #{conValue}, 
+       	   con_discount= #{conDiscount}, 
+       	   plan_gw_id = #{planGwId},
+       	   apply_gw_id = #{applyGwId},
+       	   write_gw_id = #{writeGwId},
+       	   service_gw_id = #{serviceGwId},
+           company_id= #{companyId},
+           status = #{status},
+           memo = #{memo}
+     where id = #{id}
+  </update>
+  
+  <update id="updateSk" parameterType="com.niu.crm.model.PxContract" >
+  	update t_px_contract
+       set first_sk_date=#{firstSkDate},
+           sk_value = #{skValue}
+     where id = #{id}
+  </update>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from t_px_contract where id = #{id}
+  </delete>
+  
+  <select id="selectByIdOrNo" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+      from t_cust_contract a, t_px_contract c, t_px_customer s
+     where a.id=c.con_id and a.cstm_id=s.cstm_id 
+    <if test="id != null " >
+    and c.id = #{id}
+    </if>
+    <if test="id == null" >
+    and c.con_no = #{conNo}
+    </if>
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_px_contract c
+    where id=#{id}
+  </select>
+  
+  <select id="selectCustFirstSignDate" resultType="java.util.Date" parameterType="java.lang.Long" >
+    select min(cc.sign_date) from t_lx_contract a, t_cust_contract cc
+     where a.con_id = cc.id and cc.cstm_id=#{cstmId} and cc.sign_date is not null
+  </select>
+  
+  <sql id="queryClause">
+  	from t_customer a, t_px_customer b, t_cust_contract c, t_px_contract d
+    where a.id=b.cstm_id and b.id =c.stu_id and c.id=d.con_id
+    <if test="params.companyId != null" >
+      and d.company_id = #{params.companyId}
+    </if>
+    <if test="params.conNo != null and params.conNo != '' " >
+      and c.con_no like  #{params.conNo}
+    </if>
+    <if test="params.conTypes != null" >
+      and d.con_type in 
+		<foreach collection="params.conTypes" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+    </if>
+    <if test="params.stuFromCode != null" >
+      and exists (select * from t_dict dict where id=b.stu_from_id and (dict_code = #{params.stuFromCode} or dict.dict_code like concat(#{params.stuFromCode},'.%')) )
+    </if>
+    <if test="params.signGwId != null " >
+      and c.sign_gw_id =  #{params.signGwId}
+    </if>
+    <if test="params.planGwId != null " >
+      and d.plan_gw_id =  #{params.planGwId}
+    </if>
+    <if test="params.applyGwId != null " >
+      and d.apply_gw_id =  #{params.applyGwId}
+    </if>
+    <if test="params.writeGwId != null " >
+      and d.write_gw_id =  #{params.writeGwId}
+    </if>
+    <if test="params.serviceGwId != null " >
+      and d.service_gw_id =  #{params.serviceGwId}
+    </if>
+    <if test="params.cstmId != null " >
+      and b.cstm_id =  #{params.cstmId}
+    </if>
+    <if test="params.cstmName != null" >
+      and a.name like  #{params.cstmName}
+    </if>
+    <if test="params.signFrom != null " >
+      and c.sign_date &gt;= #{params.signFrom}
+    </if>
+    <if test="params.signTo != null " >
+      and c.sign_date &lt; date_add(#{params.signTo}, interval 1 day)
+    </if>
+    <if test="params.status != null" >
+      and c.status =  #{params.status}
+    </if>
+    
+    <if test="params.aclClause != null and params.aclClause !='' " >
+      ${params.aclClause}
+    </if>
+  </sql>  
+  
+  <select id="statContract" resultMap="DTOResultMap" >
+    select sum(con_value) as con_value, sum(con_discount) as con_discount, sum(sk_value) as sk_value
+    <include refid="queryClause"/>
+  </select> 
+  
+  <select id="countContract" resultType="Integer">
+    select count(*) 
+    <include refid="queryClause"/>
+  </select>
+  
+  <select id="queryContract" resultMap="DTOResultMap" >
+    select 
+      a.id as cstm_id, a.name as cstm_name, b.stu_from_id, b.stu_city, b.curr_school,
+      c.id, c.stu_id, c.con_no, c.con_type,  c.country_codes, c.country_names, 
+      c.plan_enter_year, c.plan_enter_season,
+      c.con_value,  c.con_discount, c.sk_value, 
+      c.sign_gw_id, c.plan_gw_id, c.apply_gw_id, c.write_gw_id, c.service_gw_id,
+      c.sign_date, c.company_id,c.status, c.created_at, c.creator_id
+    <include refid="queryClause"/>
+    <if test="pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager.sort ==null">
+		order by c.created_at desc
+	</if>		
+	limit #{pager.offset}, #{pager.size}
+  </select>   
+</mapper>  

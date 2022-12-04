@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.ZxgwCallbackRemindMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.ZxgwCallbackRemind" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    <result column="zxgw_id" property="zxgwId" jdbcType="BIGINT" />
+    <result column="source_zxgw_id" property="sourceZxgwId" jdbcType="BIGINT" />
+    <result column="remind_type" property="remindType" jdbcType="VARCHAR" />
+    <result column="latest_contact_time" property="latestContactTime" jdbcType="TIMESTAMP" />
+    <result column="contact_id" property="contactId" jdbcType="BIGINT" />
+    <result column="contact_time" property="contactTime" jdbcType="TIMESTAMP" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <resultMap id="StuZxgwExResultMap" type="com.niu.crm.model.StuZxgwEx" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="cstm_name" property="cstmName" jdbcType="VARCHAR" />
+    <result column="stu_from_id" property="stuFromId" jdbcType="BIGINT" />
+    <result column="stu_level" property="stuLevel" jdbcType="INTEGER" />
+    <result column="zxgw_id" property="zxgwId" jdbcType="BIGINT" />
+    <result column="assign_date" property="assignDate" jdbcType="TIMESTAMP" />
+    <result column="contact_count" property="contactCount" jdbcType="INTEGER" />
+    <result column="last_contact_date" property="lastContactDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <resultMap id="CheckReportLineMap" type="com.niu.crm.model.CallbackCheckLine" >
+  	<id column="zxgw_id" property="zxgwId" jdbcType="BIGINT" />
+  	<result column="total_count" property="totalCount" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="CheckReportDetailMap" type="com.niu.crm.model.CallbackCheckDetail" >
+  	<id column="id" property="id" jdbcType="BIGINT" />
+    <result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="cstm_name" property="cstmName" jdbcType="VARCHAR" />
+    <result column="stu_from_id" property="stuFromId" jdbcType="BIGINT" />
+    <result column="contact_time" property="contactTime" jdbcType="TIMESTAMP" />
+    <result column="latest_contact_time" property="latestContactTime" jdbcType="TIMESTAMP" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <resultMap id="ZxgwCallbackRemindVOResultMap" type="com.niu.crm.vo.ZxgwCallbackRemindVO" extends="BaseResultMap"> 
+    <result column="cstm_name" property="cstmName" jdbcType="VARCHAR" />
+           	
+    <association property="student" javaType="com.niu.crm.model.LxCustomer" >
+    	<id property="id" column="stu_id"/>
+    	<result column="cstm_id" property="cstmId" jdbcType="BIGINT" /> 
+    	<result column="stu_from_id" property="stuFromId" jdbcType="BIGINT" />
+    	<result column="stu_xl" property="stuXl" jdbcType="VARCHAR" />
+    	<result column="plan_country" property="planCountry" jdbcType="VARCHAR" />
+    	<result column="plan_xl" property="planXl" jdbcType="VARCHAR" />
+    	<result column="stu_city" property="stuCity" jdbcType="VARCHAR" />
+    	<result column="plan_enter_year" property="planEnterYear" jdbcType="VARCHAR" />
+    	<result column="plan_enter_season" property="planEnterSeason" jdbcType="VARCHAR" />
+    	<result column="company_id" property="companyId" jdbcType="BIGINT" />
+    </association>
+    <association property="stuZxgw" javaType="com.niu.crm.model.StuZxgw" >
+    	<id property="id" column="stu_zxgw_id"/>
+    	<result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    	<result column="stu_level" property="stuLevel" jdbcType="INTEGER" />
+    	<result column="zxgw_id" property="zxgwId" jdbcType="BIGINT" />
+    	<result column="assign_date" property="assignDate" jdbcType="TIMESTAMP" />
+    	<result column="contact_count" property="contactCount" jdbcType="INTEGER" />
+    	<result column="last_contact_date" property="lastContactDate" jdbcType="TIMESTAMP" />    	
+    </association>
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, stu_id, zxgw_id, source_zxgw_id,remind_type, latest_contact_time, 
+    contact_id, contact_time, created_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.ZxgwCallbackRemind" >
+    insert into t_zxgw_callback_remind(
+    	stu_id, zxgw_id, source_zxgw_id, remind_type, latest_contact_time, created_at)
+    values (
+    	#{stuId}, #{zxgwId},  #{sourceZxgwId},  #{remindType}, #{latestContactTime}, now() 
+    )
+  </insert>
+  
+  <update id="updateContactTime" parameterType="com.niu.crm.model.ZxgwCallbackRemind" >
+    update t_zxgw_callback_remind 
+       set contact_id=#{contactId}, contact_time = #{contactTime},updated_at=sysdate()
+     where id = #{id}
+       and contact_time is null
+  </update>
+  
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_zxgw_callback_remind
+    where id = #{id}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" >
+     delete from t_zxgw_callback_remind
+      where id=#{id}
+  </delete>
+  
+  <delete id="deleteBySourceZxgw" >
+     delete from t_zxgw_callback_remind
+      where stu_id=#{stuId} and source_zxgw_id=#{sourceZxgwId} 
+  </delete>
+  
+  <delete id="delete" >
+     delete from t_zxgw_callback_remind
+      where created_at &lt; #{endDate}
+    <if test="callbackType !=null" >
+    	and remind_type = #{callbackType} 
+    </if>
+  </delete>
+  
+  <sql id="simpleQueryClause">
+  	from t_zxgw_callback_remind c
+  	where 1=1
+    <if test="params.zxgwId != null" >
+      and c.zxgw_id = #{params.zxgwId}
+    </if>
+    <if test="params.stuId != null" >
+      and c.stu_id = #{params.stuId}
+    </if>
+    <if test="params.callbackType != null" >
+      and c.remind_type = #{params.callbackType}
+    </if>
+    <if test="params.createdFrom != null " >
+      and c.created_at &gt;= #{params.createdFrom}
+    </if>
+    <if test="params.createdTo != null " >
+      and c.created_at &lt;= #{params.createdTo}
+    </if>
+    <if test="params.latest_contact_from != null" >
+      and c.latest_contact_time &gt;= #{params.latest_contact_from}
+    </if>
+    <if test="params.latest_contact_to != null" >
+      and c.latest_contact_time &lt;= #{params.latest_contact_to}
+    </if>
+  </sql> 
+  
+  <select id="simpleCount" resultType="Integer" >
+  	select count(*)
+    <include refid="simpleQueryClause" />
+  </select>
+  
+  <select id="simpleList" resultMap="BaseResultMap" >
+  	select <include refid="Base_Columns" />
+    <include refid="simpleQueryClause" />
+    <if test="pager !=null and pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager ==null or pager.sort ==null">
+		order by c.created_at desc
+	</if>	
+	<if test="pager !=null ">
+		limit #{pager.offset}, #{pager.size}
+	</if>	
+	<if test="pager ==null ">
+		limit 10000
+	</if>
+  </select>
+  
+  <sql id="queryRemindClause">
+      from t_lx_customer a left join t_dict dict on stu_from_id=dict.id, t_customer c, t_stu_zxgw zxgw, t_zxgw_callback_remind r
+     where a.cstm_id=c.id and a.id=zxgw.stu_id 
+       and zxgw.stu_id=r.stu_id and zxgw.zxgw_id=r.zxgw_id 
+       and a.archive=false and c.archive=false 
+    <if test="params.callbackType != null" >
+      and r.remind_type = #{params.callbackType}
+    </if>
+    <if test="params.company_id != null" >
+      and a.company_id = #{params.company_id}
+    </if>
+    <if test="params.unitCode != null and params.unitCode != '' " >
+      and exists (
+      	select uu.id from t_user uu, t_unit unit  
+         where uu.unit_id=unit.id and zxgw.zxgw_id=uu.id and unit.code like concat(#{params.unitCode},'%')
+      )	
+    </if>
+    <if test="params.zxgw_id != null" >
+      and r.zxgw_id = #{params.zxgw_id}
+    </if>
+    <if test="params.source_zxgw_id != null" >
+      and r.source_zxgw_id = #{params.source_zxgw_id}
+    </if>
+	<if test="params.stu_level != null" >
+		and zxgw.stu_level in 
+		<foreach collection="params.stu_level" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+	<if test="params.plan_xl != null" >
+		and a.plan_xl in 
+		<foreach collection="params.plan_xl" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.assign_from != null " >
+      and zxgw.assign_date &gt;= #{params.assign_from}
+    </if>
+    <if test="params.assign_to != null " >
+      and zxgw.assign_date &lt; #{params.assign_to}
+    </if>
+    <if test="params.created_from != null " >
+      and r.created_at &gt;= #{params.created_from}
+    </if>
+    <if test="params.created_to != null " >
+      and r.created_at &lt; #{params.created_to}
+    </if>
+    <if test="params.callback_status != null and params.callback_status == 'none'" >
+      and r.contact_time is null 
+    </if>
+    <if test="params.callback_status != null and params.callback_status == 'finish'" >
+      and r.contact_time is not null
+    </if>
+    <if test="params.callback_status != null and params.callback_status == 'ontime'" >
+      and r.contact_time &lt;= r.latest_contact_time
+    </if>
+    <if test="params.callback_status != null and params.callback_status == 'overtimeFinish'" >
+      and  r.contact_time &gt; r.latest_contact_time
+    </if>
+    <if test="params.callback_status != null and params.callback_status == 'delayed'" >
+      and (
+           r.contact_time &gt; r.latest_contact_time
+        or (r.contact_time is null and r.latest_contact_time &lt; sysdate() )
+      )
+    </if>
+    <if test="params.latest_contact_from != null" >
+      and r.latest_contact_time &gt;= #{params.latest_contact_from}
+    </if>
+    <if test="params.latest_contact_to != null" >
+      and r.latest_contact_time &lt;= #{params.latest_contact_to}
+    </if>
+    
+    <if test="params.aclClause != null and params.aclClause !='' " >
+      ${params.aclClause}
+    </if>
+  </sql>
+  
+  <select id="queryRemind" resultMap="ZxgwCallbackRemindVOResultMap" >
+    select c.name as cstm_name, 
+           a.cstm_id, a.stu_from_id, a.plan_country, a.plan_xl, a.stu_city, a.company_id, 
+           zxgw.id stu_zxgw_id, zxgw.stu_id, zxgw.zxgw_id, 
+           zxgw.stu_level, zxgw.assign_date, zxgw.last_contact_date, zxgw.contact_count,
+           r.id, r.stu_id, r.remind_type, r.contact_time, r.latest_contact_time, r.created_at
+    <include refid="queryRemindClause" />
+    <if test="pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager.sort ==null">
+		order by r.created_at desc
+	</if>	
+    limit #{pager.offset}, #{pager.size}
+  </select>
+  
+  <select id="countRemind" resultType="Integer" >
+    select count(*)
+    <include refid="queryRemindClause" />
+  </select>
+  
+  <!--   -->
+  <select id="queryStudentForRemind" resultMap="StuZxgwExResultMap" >
+    select zxgw.id, a.cstm_id, c.name as cstm_name, a.stu_from_id,
+           zxgw.stu_id, zxgw.zxgw_id, zxgw.assign_date, zxgw.stu_level, zxgw.last_contact_date
+      from t_lx_customer a, t_customer c, t_stu_zxgw zxgw 
+     where a.cstm_id=c.id and a.id=zxgw.stu_id and a.archive=false and c.archive=false 
+    
+    <if test="params.callbackType == 'WEEKLY' or params.callbackType == 'MONTHLY' ">    	
+      and not exists (select * from t_zxgw_callback_remind 
+         where stu_id=a.id and zxgw_id=zxgw.zxgw_id and remind_type= #{params.callbackType} 
+         <if test="params.callbackType == 'WEEKLY'">
+         	and created_at &gt; date_sub(SYSDATE(),INTERVAL 3 day)
+         </if>
+         <if test="params.callbackType == 'MONTHLY' ">
+         	and created_at &gt; date_sub(SYSDATE(),INTERVAL 10 day)
+         </if>
+      )
+    </if>   
+    <if test="params.company_id != null" >
+      and a.company_id = #{params.company_id}
+    </if>
+    <if test="params.zxgw_id != null" >
+      and zxgw.zxgw_id = #{params.zxgw_id}
+    </if>
+	<if test="params.stu_level != null" >
+		and zxgw.stu_level in 
+		<foreach collection="params.stu_level" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.country_codes != null and params.country_codes.length >0" >
+    	and exists (
+    	  select * from t_stu_plan_country where stu_id=a.id and country_code in 
+          <foreach collection="params.country_codes" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	      </foreach>
+        )
+    </if>
+	<if test="params.plan_xl != null and params.plan_xl.length >0" >
+		and a.plan_xl in 
+		<foreach collection="params.plan_xl" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.assign_from != null " >
+      and zxgw.assign_date &gt;= #{params.assign_from}
+    </if>
+    <if test="params.assign_to != null " >
+      and zxgw.assign_date &lt; #{params.assign_to}
+    </if>
+    <if test="maxRows != null " >
+      limit ${maxRows}
+    </if>
+    <if test="maxRows == null " >
+      limit 5000
+    </if>
+  </select>
+  
+  <sql id="checkReportStatClause">
+  	<if test="params.companyId != null" >
+      and exists (
+        select * from t_user user, t_unit unit 
+         where user.unit_id=unit.id and user.id=r.zxgw_id
+           and unit.company_id = #{params.companyId} 
+      )
+    </if>
+    <if test="params.dateFrom != null" >
+      and r.latest_contact_time &gt;= #{params.dateFrom}
+    </if>
+    <if test="params.dateTo != null" >
+      and r.latest_contact_time &lt;= #{params.dateTo}
+    </if>
+    <if test="params.stuCreatedFrom != null" >
+      and stu.created_at &gt;= #{params.stuCreatedFrom}
+    </if>
+    <if test="params.stuCreatedTo != null" >
+      and stu.created_at &lt;= #{params.stuCreatedTo}
+    </if>
+    <if test="params.zxgwId != null" >
+      and r.zxgw_id = #{params.zxgwId}
+    </if>
+    <if test="params.stuFromId != null" >
+      and stu.stu_from_id = #{params.stuFromId}
+    </if>
+    <if test="params.stuFromCode != null and params.stuFromCode != ''" >
+      and exists (
+      	select * from t_dict dict 
+      	 where dict.id=stu.stu_from_id and dict_code like concat(#{params.stuFromCode}, '%')
+      )
+    </if>
+    <if test="params.callbackStatus != null and params.callbackStatus == 'FINISH'" >
+      and r.contact_time is not null
+    </if>
+    <if test="params.callbackStatus != null and params.callbackStatus == 'NOFINISH'" >
+      and r.contact_time is null
+    </if>
+    <if test="params.callbackStatus != null and params.callbackStatus == 'ONTIME'" >
+      and r.contact_time &lt;= r.latest_contact_time
+    </if>
+    
+    <if test="params.callbackStatus != null and params.callbackStatus == 'OVERTIME_FINISH'" >
+      and r.contact_time &gt; r.latest_contact_time
+    </if>
+  </sql>
+  
+  <select id="checkReportStat" resultMap="CheckReportLineMap" >
+    select r.zxgw_id, count(*) total_count
+      from t_zxgw_callback_remind r, t_lx_customer stu
+     where r.stu_id=stu.id and r.remind_type = #{params.callbackType}
+    <include refid="checkReportStatClause" />
+    group by r.zxgw_id
+  </select>
+  
+  <select id="checkReportDetail" resultMap="CheckReportDetailMap" >
+    select r.id, c.name as cstm_name, stu.id stu_id, stu.cstm_id, stu.stu_from_id, 
+           r.contact_time, r.latest_contact_time, r.created_at
+      from t_zxgw_callback_remind r, t_lx_customer stu, t_customer c
+     where r.stu_id=stu.id and stu.cstm_id=c.id and r.remind_type = #{params.callbackType}
+    <include refid="checkReportStatClause" />
+  </select>
+</mapper>  

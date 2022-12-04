@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CpStuZxgwMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.StuZxgw" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    <result column="zxgw_id" property="zxgwId" jdbcType="BIGINT" />
+    <result column="assign_date" property="assignDate" jdbcType="TIMESTAMP" />
+    <result column="stu_level" property="stuLevel" jdbcType="BIGINT" />
+    <result column="contact_count" property="contactCount" jdbcType="INTEGER" />
+    <result column="last_contact_date" property="lastContactDate" jdbcType="TIMESTAMP" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+  </resultMap>
+  
+  <resultMap id="CustomerZxgwVOMap" type="com.niu.crm.vo.CpCustomerZxgwVO" extends="BaseResultMap">
+    
+    <association property="student" javaType="com.niu.crm.model.CpCustomer" >
+    	<id property="id" column="stu_id"/>
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="inquire_date" property="inquireDate" jdbcType="DATE" />
+    <result column="visit_date" property="visitDate" jdbcType="DATE" />
+    <result column="visitor_type" property="visitorType" jdbcType="VARCHAR" />
+    <result column="stu_from_id" property="stuFromId" jdbcType="BIGINT" />
+    <result column="gpa" property="gpa" jdbcType="VARCHAR" />
+    <result column="current_specialty" property="currentSpecialty" jdbcType="VARCHAR" />
+    <result column="hope_specialty" property="hopeSpecialty" jdbcType="VARCHAR" />
+    <result column="curr_school" property="currSchool" jdbcType="VARCHAR" />
+    <result column="curr_grade" property="currGrade" jdbcType="VARCHAR" />
+    
+    <result column="stu_xl" property="stuXl" jdbcType="VARCHAR" />
+    <result column="plan_country" property="planCountry" jdbcType="VARCHAR" />
+    <result column="plan_xl" property="planXl" jdbcType="VARCHAR" />
+    <result column="plan_enter_year" property="planEnterYear" jdbcType="VARCHAR" />
+    <result column="plan_enter_season" property="planEnterSeason" jdbcType="VARCHAR" />
+    <result column="stu_city" property="stuCity" jdbcType="VARCHAR" />
+    <result column="stu_contact_count" property="contactCount" jdbcType="INTEGER" />
+    <result column="stu_last_contact_date" property="lastContactDate" jdbcType="TIMESTAMP" />
+    <result column="unit_id" property="unitId" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+    <result column="owner_id" property="ownerId" jdbcType="BIGINT" />
+    </association>
+    
+    <association property="customer" javaType="com.niu.crm.model.Customer" >
+    	<id property="id" column="cstm_id"/>
+    	<result column="name" property="name" jdbcType="VARCHAR" />
+    	<result column="gender" property="gender" jdbcType="VARCHAR" />
+    	<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    	<result column="email" property="email" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, stu_id, zxgw_id, assign_date, stu_level, creator_id, created_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.StuZxgw" >
+    insert into t_cp_stu_zxgw
+     (stu_id, zxgw_id, assign_date, stu_level, creator_id, created_at)
+    values (
+      #{stuId}, #{zxgwId},  #{assignDate}, #{stuLevel}, #{creatorId}, now()
+    )
+  </insert>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+    select 
+    	<include refid="Base_Columns"/>
+    from t_cp_stu_zxgw
+    where id=#{id}
+  </select>
+  
+  <select id="selectByStuIdAndZxgw" resultMap="BaseResultMap" >
+    select 
+    	<include refid="Base_Columns"/>
+    from t_cp_stu_zxgw
+    where stu_id=#{stuId} and zxgw_id = #{zxgwId}
+  </select>
+  
+  <select id="selectByStuId" resultMap="BaseResultMap" >
+    select 
+    	<include refid="Base_Columns"/>
+    from t_cp_stu_zxgw
+    where stu_id=#{stuId}
+    order by assign_date, created_at
+  </select>
+  
+  <delete id="delete" >
+    delete from t_cp_stu_zxgw where id=#{id}
+  </delete>
+  
+  <delete id="update" >
+    update t_cpxstu_zxgw set stu_level=#{stuLevel} where id=#{id}
+  </delete>
+  
+  <delete id="deleteByStuId" >
+    delete from t_px_stu_zxgw where stu_id=#{stuId}
+  </delete>
+  
+  <update id="updateContactDate" >
+    update t_cp_stu_zxgw a
+       set contact_count =#{contactCount},
+       	   last_contact_date=#{lastContactDate}
+     where id = #{id}
+  </update>
+  
+  
+  <sql id="queryClause">
+  	from t_cp_customer a left outer join t_dict dict on a.stu_from_id=dict.id, t_customer c, t_cp_stu_zxgw zxgw
+    where a.cstm_id=c.id and a.id=zxgw.stu_id and a.archive=false and c.archive=false
+    <if test="params.company_id != null" >
+      and a.company_id = #{params.company_id}
+    </if>
+    <if test="params.unitCode != null" >
+      and exists( 
+		 select * from t_user user, t_unit unit
+		  where user.unit_id=unit.id and zxgw.zxgw_id=user.id 
+		    and ( unit.code =#{params.unitCode} or unit.code like concat(#{params.unitCode},'%') )
+       )
+    </if>
+    <if test="params.stuFromCode != null" >
+      and (dict.dict_code = #{params.stuFromCode} or dict.dict_code like concat(#{params.stuFromCode},'.%') )
+    </if>
+    <if test="params.stuFromIds != null and params.stuFromIds.length >0" >
+		and a.stu_from_id in 
+		<foreach collection="params.stuFromIds" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.zxgwList != null" >
+		and zxgw.zxgw_id in
+		<foreach collection="params.zxgwList" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+    </if>
+    <if test="params.owner_id != null" >
+      and a.owner_id = #{params.owner_id}
+    </if>
+    <if test="params.creator_id != null" >
+      and a.creator_id = #{params.creator_id}
+    </if>
+    <if test="params.name != null and params.name !='' " >
+      and c.name like #{params.name}
+    </if>
+    <if test="params.gender != null and params.gender !='' " >
+      and c.gender = #{params.gender}
+    </if>
+    <if test="params.mobile != null and params.mobile !='' " >
+      and c.mobile like #{params.mobile}
+    </if>
+    <if test="params.phone != null and params.phone !='' " >
+      and (c.mobile like #{params.phone} or c.phone like #{params.phone})
+    </if>
+    <if test="params.visitor_type != null and params.visitor_type !='' " >
+      and a.visitor_type = #{params.visitor_type}
+    </if>
+	<if test="params.stu_level != null" >
+		and zxgw.stu_level in 
+		<foreach collection="params.stu_level" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+	<if test="params.exclude_stu_level != null " >
+		and (zxgw.stu_level is null or zxgw.stu_level not in 
+		<foreach collection="params.exclude_stu_level" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>)
+	</if>
+    <if test="params.country_codes != null" >
+		and a.plan_country in 
+		<foreach collection="params.country_codes" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+	<if test="params.plan_xl != null" >
+		and a.plan_xl in 
+		<foreach collection="params.plan_xl" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.curr_school != null " >
+      and a.curr_school like concat('%',#{params.curr_school},'%')
+    </if>
+    <if test="params.school_input_flag != null and params.visitor_type =='1' " >
+      and a.curr_school is not null
+    </if>
+    <if test="params.school_input_flag != null and params.visitor_type =='0' " >
+      and a.curr_school is null
+    </if>
+    <if test="params.assign_from != null " >
+      and zxgw.assign_date &gt;= #{params.assign_from}
+    </if>
+    <if test="params.assign_to != null " >
+      and zxgw.assign_date &lt; date_add(#{params.assign_to}, interval 1 day)
+    </if>
+    <if test="params.inquire_from != null " >
+      and a.inquire_date &gt;= #{params.inquire_from}
+    </if>
+    <if test="params.inquire_to != null " >
+      and a.inquire_date &lt; date_add(#{params.inquire_to}, interval 1 day)
+    </if>
+    <if test="params.visit_from != null " >
+      and a.visit_date &gt;= #{params.visit_from}
+    </if>
+    <if test="params.visit_to != null " >
+      and a.visit_date &lt; date_add(#{params.visit_to}, interval 1 day)
+    </if>
+    <if test="params.created_from != null " >
+      and a.created_at &gt;= #{params.created_from}
+    </if>
+    <if test="params.created_to != null " >
+      and a.created_at &lt; date_add(#{params.created_to}, interval 1 day)
+    </if>
+    
+    <if test="params.last_contact_from != null " >
+      and a.last_contact_date &gt;= #{params.last_contact_from}
+    </if>
+    <if test="params.last_contact_to != null " >
+      and a.last_contact_date &lt; date_add(#{params.last_contact_to}, interval 1 day)
+    </if>
+    <if test="params.contactCountMin != null " >
+      and a.contact_count &gt;= #{params.contactCountMin}
+    </if>
+    <if test="params.contactCountMax != null " >
+      and a.contact_count &lt;= #{params.contactCountMax}
+    </if>
+    
+    <if test="params.planEnterYear != null " >
+      and a.plan_enter_year = #{params.planEnterYear}
+    </if>
+    
+    <if test="params.planEnterSeason != null and params.planEnterSeason !='' " >
+      and a.plan_enter_season = #{params.planEnterSeason}
+    </if>
+    
+    <if test="params.signFlag != null and params.signFlag " >
+      and a.sign_date is not null
+    </if>   
+    <if test="params.signFlag != null and !params.signFlag " >
+      and a.sign_date is null
+    </if> 
+    
+    <if test="params.exclude_ids != null and params.exclude_ids !='' " >
+      and a.id not in (${params.exclude_ids})
+    </if>
+    
+    <if test="params.aclClause != null and params.aclClause !='' " >
+      ${params.aclClause}
+    </if>
+  </sql>  
+  
+  <select id="countStuZxgw" resultType="Integer">
+    select count(*) 
+    <include refid="queryClause"/>
+  </select>
+  
+  <select id="queryStuZxgw" resultMap="CustomerZxgwVOMap" >
+    select 
+      zxgw.id,zxgw.zxgw_id, zxgw.stu_level , zxgw.assign_date , zxgw.contact_count, zxgw.last_contact_date, 
+      a.id stu_id, a.cstm_id, a.inquire_date, a.visit_date, a.gpa, a.current_specialty, a.hope_specialty,
+      a.stu_level, a.stu_xl, a.curr_school, a.curr_grade, a.plan_country, a.plan_xl, 
+      a.plan_enter_year, a.plan_enter_season, a.stu_from_id,  
+      a.contact_count stu_contact_count, a.last_contact_date stu_last_contact_date, 
+      a.stu_city, a.unit_id, a.company_id, 
+      c.name, c.gender, c.mobile, c.email, a.owner_id, a.creator_id, a.created_at
+    <include refid="queryClause"/>
+    
+    <if test="pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager.sort ==null">
+		order by a.created_at desc
+	</if>		
+	limit #{pager.offset}, #{pager.size}
+  </select>
+  
+</mapper>  

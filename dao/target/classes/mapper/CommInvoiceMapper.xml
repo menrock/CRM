@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CommInvoiceMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.CommInvoice" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="college_id" property="collegeId" jdbcType="BIGINT" />
+    <result column="org_id" property="orgId" jdbcType="BIGINT" />
+    <result column="object_name" property="objectName" jdbcType="VARCHAR" />
+    <result column="inv_currency" property="invCurrency" jdbcType="VARCHAR" />
+    <result column="inv_amount" property="invAmount" jdbcType="DECIMAL" />
+    <result column="sent_date" property="sentDate" jdbcType="TIMESTAMP" />
+    <result column="received_date" property="receivedDate" jdbcType="TIMESTAMP" />
+    <result column="received_amount" property="receivedAmount" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="TIMESTAMP" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="inv_no" property="invNo" jdbcType="INTEGER" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, inv_no, college_id, org_id, object_name, inv_currency, inv_amount, sent_date, received_date, received_amount,
+    status, creator_id, created_at, updated_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.CommInvoice" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into comm_invoice (
+        inv_no, college_id, org_id, inv_currency, inv_amount, status, creator_id, created_at, updated_at
+    )
+    values (
+       #{invNo}, #{collegeId}, #{orgId}, #{invCurrency}, #{invAmount}, #{status}, #{creatorId}, now(), now()
+    )
+  </insert>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  	select <include refid="Base_Columns" />
+      from comm_invoice
+     where id = #{id}
+  </select>
+  
+  <update id="update" parameterType="com.niu.crm.model.CommInvoice" >
+    update comm_invoice
+       set college_id = #{collegeId},
+           org_id  = #{orgId},
+           inv_currency = #{invCurrency},
+           inv_amount = #{invAmount},
+           updated_at = now()
+     where id = #{id}
+  </update>
+  
+  <update id="sent" parameterType="com.niu.crm.model.CommInvoice" >
+    update comm_invoice
+       set sent_date=#{sentDate}, status='SENT',
+           updated_at = now()
+     where id = #{id}
+  </update>
+  
+  <update id="received" parameterType="com.niu.crm.model.CommInvoice" >
+    update comm_invoice
+       set sent_date=#{receivedDate}, status='RECEIVED',
+           updated_at = now()
+     where id = #{id}
+  </update>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from comm_invoice where id = #{id}
+  </delete>
+  
+  <sql id="queryClause">
+  	from comm_invoice a
+    where 1=1
+    <if test="params.collegeId != null" >
+      and college_id = #{params.collegeId}
+    </if>
+    <if test="params.orgId != null" >
+      and org_id = #{params.orgId}
+    </if>
+    <if test="params.objectName != null and params.objectName !=''" >
+      and object_name like #{params.objectName}
+    </if>
+    
+    <if test="params.status != null" >
+      and status = #{params.status}
+    </if>
+    
+    <if test="params.sentDateFrom != null" >
+    <![CDATA[
+       and sent_date >= #{params.sentDateFrom}
+    ]]>
+    </if>
+    
+    <if test="params.sentDateTo != null" >
+    <![CDATA[
+       and sent_date < #{params.sentDateTo}
+    ]]>
+    </if>
+    
+    <if test="params.receivedDateFrom != null" >
+    <![CDATA[
+       and received_date >= #{params.receivedDateFrom}
+    ]]>
+    </if>
+    
+    <if test="params.receivedDateTo != null" >
+    <![CDATA[
+       and received_date >= #{params.receivedDateTo}
+    ]]>
+    </if>
+  </sql>  
+  
+  <select id="countInvoice" resultType="Integer">
+    select count(*) 
+    <include refid="queryClause"/>
+    
+  </select>
+  
+  <select id="queryInvoice" resultMap="BaseResultMap" >
+    select 
+      <include refid="Base_Columns" />
+    <include refid="queryClause"/>
+    <if test="pager !=null and pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager == null or pager.sort ==null">
+		order by created_at desc
+	</if>	
+	<if test="pager ==null ">	
+	  limit 0,1000
+	</if>	
+	<if test="pager !=null ">	
+	limit #{pager.offset}, #{pager.size}
+	</if>	
+  </select>   
+</mapper>    

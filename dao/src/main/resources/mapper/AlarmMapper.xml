@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.AlarmMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.Alarm" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="alarm_date" property="alarmDate" jdbcType="DATE" />
+    <result column="alarm_time" property="alarmTime" jdbcType="TIME" />
+    <result column="alarm_way" property="alarmWay" jdbcType="INTEGER" />
+    <result column="repeat_type" property="repeatType" jdbcType="VARCHAR" />
+    <result column="repeat_days" property="repeatDays" jdbcType="VARCHAR" />
+    <result column="alarm_user_ids" property="alarmUserIds" jdbcType="VARCHAR" />
+    <result column="alarm_unit_ids" property="alarmUnitIds" jdbcType="VARCHAR" />
+    <result column="alarmed_time" property="alarmedTime" jdbcType="TIMESTAMP" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, stu_id, content, url, alarm_date, alarm_time, alarm_way, repeat_type, repeat_days, 
+    alarm_user_ids, alarm_unit_ids,   alarmed_time, creator_id, created_at, updated_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.Alarm" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_alarm (
+         stu_id, content, url, alarm_date, alarm_time, alarm_way, repeat_type, repeat_days, 
+         alarm_user_ids, alarm_unit_ids,   creator_id, created_at, updated_at
+    )values(
+         #{stuId}, #{content}, #{url}, #{alarmDate}, #{alarmTime}, #{alarmWay}, #{repeatType}, #{repeatDays}, 
+         #{alarmUserIds}, #{alarmUnitIds},  #{creatorId}, now(), now()
+    )
+  </insert>
+  
+  <delete id="delete" >
+  	delete from t_alarm where id=#{id}
+  </delete>
+  
+  <!--  修改内容等 -->
+  <update id="update">
+  	update t_alarm
+	   set content=#{content}, url=#{url}, alarm_date=#{alarmDate}, alarm_time=#{alarmTime}, 
+	       alarm_way =#{alarmWay}, repeat_type=#{repeatType}, repeat_days=#{repeatDays}, 
+	       alarm_user_ids =#{alarmUserIds}, alarm_unit_ids=#{alarmUnitIds}, 
+	       enabled=#{enabled}, updated_at=#{updatedAt}	
+     where id=#{id}
+  </update>
+  
+  <!-- 消息发送之后修改 -->
+  <update id="updateAfterSend">
+  	update t_alarm
+	   set enabled=#{enabled}, alarmed_time =#{alarmedTime} 	
+     where id=#{id}
+  </update>
+  
+  <select id="selectById" resultMap="BaseResultMap" >
+  	select 
+    <include refid="Base_Columns" />
+    from t_alarm
+    where id=#{id}
+  </select>
+  
+  <sql id="queryClause">
+  	 from t_alarm a 
+    where 1=1
+    <if test="params.stuId != null" >
+      and a.stu_id = #{params.stuId}
+    </if>
+    <if test="params.enabled != null" >
+      and a.enabled = #{params.enabled}
+    </if>
+    <if test="params.creatorId != null" >
+      and a.creatorId = #{params.creatorId}
+    </if>
+  </sql>  
+  
+  <select id="queryAlarm" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    <include refid="queryClause"/>
+    <if test="pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager.sort ==null">
+		order by a.enabled desc, a.updated_at desc
+	</if>
+	limit #{pager.offset}, #{pager.size}
+  </select>
+  
+  <select id="countAlarm" resultType="Integer" >
+    select count(*)
+    <include refid="queryClause"/>
+  </select>
+</mapper>  

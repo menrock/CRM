@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.PreContactRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.PreContactRecord" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="gw_id" property="gwId" jdbcType="VARCHAR" />
+    <result column="contact_type" property="contactType" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="contact_date" property="contactDate" jdbcType="TIMESTAMP" />
+    <result column="contact_text" property="contactText" jdbcType="VARCHAR" />
+    <result column="next_date" property="nextDate" jdbcType="TIMESTAMP" />
+    <result column="alarmed_at" property="alarmedAt" jdbcType="TIMESTAMP" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, cstm_id, gw_id, contact_type, status, contact_date, 
+    contact_text, next_date,
+    creator_id, created_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.PreContactRecord" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into pre_contact_record(
+         cstm_id, gw_id, contact_type, status, contact_date, 
+         contact_text, next_date, creator_id, created_at)
+    values (
+        #{cstmId}, #{gwId}, #{contactType}, #{status}, #{contactDate}, 
+        #{contactText}, #{nextDate}, #{creatorId}, #{createdAt}
+    )
+  </insert>
+  
+  <update id="updateAlarmed" parameterType="com.niu.crm.model.PreContactRecord" >
+    update pre_contact_record set alarmed_at=now() where id = #{id}
+  </update>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from pre_contact_record where id = #{id}
+  </delete>
+  
+  <delete id="deleteByStuId" parameterType="java.lang.Long" >
+    delete from pre_contact_record where stu_id = #{id}
+  </delete>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from pre_contact_record
+    where id = #{id}
+  </select>
+  
+  <select id="selectByCstmId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+      from pre_contact_record
+     where cstm_id = #{cstmId}
+    <if test="zxgwId != null" >
+      and gw_id = #{zxgwId}
+    </if>
+     order by contact_date asc, created_at asc
+  </select>
+  
+  <select id="query" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from pre_contact_record a
+    where 1=1
+    <if test="params.cstmId != null" >
+      and cstm_id = #{params.cstmId}
+    </if>
+    <if test="params.nextDateFrom != null" >
+      and a.next_date &lt;= #{params.nextDateFrom}
+    </if>
+    <if test="params.nextDateTo != null" >
+      and a.next_date &lt;= #{params.nextDateTo}
+    </if>
+    <if test="params.alarmed != null and params.alarmed" >
+      and a.alarmed_at is not null
+    </if>
+    <if test="params.alarmed != null and !params.alarmed" >
+      and a.alarmed_at is null
+    </if>
+    <if test="page.sort !=null" >   
+    	order by  	
+		<foreach collection="page.sort" item="order" index="index" open="" separator="," close="">
+		    ${order.property} ${order.direction}
+		</foreach>
+    </if>
+    <if test="page.sort ==null" >
+      order by contact_date desc, created_at desc
+    </if>
+    limit #{page.offset}, #{page.size}
+  </select>
+  
+  <select id="queryLast" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from pre_contact_record
+    where 1=1
+    <if test="cstmId != null" >
+      and cstm_id = #{cstmId}
+    </if>
+    <if test="gwId != null" >
+      and gw_id = #{gwId}
+    </if>
+      order by contact_date desc
+    <if test="count != null" >
+      limit 0, #{count}
+    </if>
+    <if test="count == null" >
+      limit 0, 3
+    </if>
+  </select>
+</mapper>  

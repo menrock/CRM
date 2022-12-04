@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.SysMessageMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.SysMessage" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="owner_id" property="ownerId" jdbcType="BIGINT" />
+    <result column="sender_id" property="senderId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="sys_memo" property="sysMemo" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, content, url, status, owner_id, sender_id, created_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.SysMessage" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_sys_message (content, url,  owner_id, sender_id, sys_memo, created_at)
+       values (#{content}, #{url}, #{ownerId}, #{senderId}, #{sysMemo}, now()
+    )
+  </insert>
+  
+  <delete id="delete" >
+  	delete from t_sys_message where id=#{id}
+  </delete>
+  
+  <update id="update">
+  	update t_sys_message
+	   set status=#{status}  	
+     where id=#{id}
+  </update>
+  
+  <select id="selectById" resultMap="BaseResultMap" >
+  	select 
+    <include refid="Base_Columns" />
+    from t_sys_message
+    where id=#{id}
+  </select>
+  
+  
+  <select id="queryMessage" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from t_sys_message
+    where 1=1
+    <if test="params.ownerId !=null" >
+      and owner_id = #{params.ownerId}
+    </if>
+    <if test="params.senderId !=null" >
+      and sender_id = #{params.senderId}
+    </if>
+    <if test="params.status !=null " >
+    	and status ${params.statusOp} #{params.status}
+    </if>
+	limit #{pager.offset}, #{pager.size}
+  </select>
+  
+  
+  <select id="countMessage" resultType="Integer" >
+    select count(*)
+      from t_sys_message
+     where 1=1
+    <if test="params.ownerId !=null" >
+      and owner_id = #{params.ownerId}
+    </if>
+    <if test="params.senderId !=null" >
+      and sender_id = #{params.senderId}
+    </if>
+    <if test="params.status !=null " >
+    	and status ${params.statusOp} #{params.status}
+    </if>
+  </select>
+  
+  
+</mapper>  

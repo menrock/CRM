@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CustContractArchiveMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.CustContractArchive" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="con_id" property="conId" jdbcType="BIGINT" />
+    <result column="archive_date" property="archiveDate" jdbcType="TIMESTAMP" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  
+  <sql id="Base_Columns" >
+    id, con_id, archive_date, creator_id, created_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.CustContractArchive" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_cust_contract_archive (
+    		con_id,   archive_date,  creator_id, created_at)
+    values (
+       #{conId},   #{archiveDate},  #{creatorId}, now() )
+  </insert>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from t_cust_contract_archive where id = #{id}
+  </delete>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from t_cust_contract_archive c
+    where id = #{id}
+  </select>
+  
+  <select id="selectByConId" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from t_cust_contract_archive c
+    where con_id = #{conId}
+  </select>
+</mapper>  

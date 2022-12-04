@@ -1,0 +1,28 @@
+#tabnav { background:#d5d5d5;     }  
+#tabnav ul 
+{
+  padding:15px 0px 5px 0px;     
+  margin:5px 0px 5px 0px;     
+  list-style:none;     
+  background:#f1f1f1;     
+  border-bottom:1px solid #999; 
+}  
+#tabnav ul li 
+{     display:inline;     margin-left:10px; }  
+#tabnav ul li a 
+{
+	background:#d5d5d5;         padding:5px 10px 5px 10px;     border:1px solid #999; 
+	color: #666; /* set unselected tab link color as desired */
+  margin-right: 0px; /* set additional spacing between tabs as desired */
+  text-decoration: none;
+}  
+#tabnav ul li.current a
+{
+  background:#fff;     
+  font-weight:bold;
+  padding:5px 10px 5px 10px;     
+  border-top:1px solid #999;     
+  border-left:1px solid #999;     
+  border-right:1px solid #999;     
+  border-bottom:1px solid #FFFFFF; 
+}  

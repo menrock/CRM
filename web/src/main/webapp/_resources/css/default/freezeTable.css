@@ -1,0 +1,63 @@
+/*div外框*/
+.freezeTableDiv 
+{
+	height:200px;
+	clear: both; 
+	border: 1px solid #EEEEEE;
+	OVERFLOW: scroll;
+	width: 100% ; 
+}
+
+/*固定表头行样式*/
+.freezeRow
+{
+  position: relative; 
+  top: expression(this.parentElement.parentElement.parentElement.scrollTop);
+  z-index:2;
+}
+
+/*固定表列样式*/
+.freezeCol
+{
+  position: relative; 
+  left: expression(this.parentElement.parentElement.parentElement.parentElement.scrollLeft);
+} 
+
+/*固定表最后一列样式*/
+.freezeCol_last
+{
+  border-right: 1px solid #000000; 
+}
+
+/*固定表最后一列样式*/
+.freezeTh_last
+{
+  border-bottom: 1px solid #000000; 
+}
+
+/*表格的线*/
+.freezeTable
+{
+	border-bottom:1px solid #000000; 
+	border-right:1px solid #000000; 
+}
+
+/*单元格的线等*/
+.freezeTable td
+{
+  border-left: 1px solid #000000; 
+  border-top: 1px solid #000000; 
+}
+  
+
+.freezeTable th
+{
+  border-left: 1px solid #000000; 
+  border-top: 1px solid #000000;
+}
+
+
+
+
+
+

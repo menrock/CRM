@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CustContractSkMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.CustContractSk" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="con_id" property="conId" jdbcType="BIGINT" />
+    <result column="item_id" property="itemId" jdbcType="BIGINT" />
+    <result column="pay_line_id" property="payLineId" jdbcType="BIGINT" />
+    <result column="sk_date" property="skDate" jdbcType="TIMESTAMP" />
+    <result column="pay_type" property="payType" jdbcType="BIGINT" />
+    <result column="sk_value" property="skValue" jdbcType="DECIMAL" />
+    <result column="achivement" property="achivement" jdbcType="DECIMAL" />
+    <result column="kcgw_name" property="kcgwName" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <resultMap id="VOResultMap" type="com.niu.crm.vo.CustContractSkVO" extends="BaseResultMap">
+    <result column="item_name" property="itemName" jdbcType="VARCHAR" />
+    <result column="cstm_name" property="cstmName" jdbcType="VARCHAR" />
+    <result column="stu_from_id" property="stuFromId" jdbcType="BIGINT" />
+    <result column="con_type" property="conType" jdbcType="BIGINT" />
+    <result column="con_no" property="conNo" jdbcType="VARCHAR" />
+    <result column="country_codes" property="countryCodes" jdbcType="VARCHAR" />
+    <result column="country_names" property="countryNames" jdbcType="VARCHAR" />
+    <result column="plan_enter_year" property="planEnterYear" jdbcType="INTEGER" />
+    <result column="plan_enter_season" property="planEnterSeason" jdbcType="VARCHAR" />
+    <result column="sign_gw_id" property="signGwId" jdbcType="BIGINT" />
+    <result column="plan_gw_id" property="planGwId" jdbcType="BIGINT" />
+    <result column="apply_gw_id" property="applyGwId" jdbcType="BIGINT" />
+    <result column="write_gw_id" property="writeGwId" jdbcType="BIGINT" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, company_id, cstm_id, con_id, sk_date, item_id, pay_line_id, 
+    sk_value, achivement, status, kcgw_name, memo, creator_id, created_at, updated_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.CustContractSk" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_cust_contract_sk (
+    		company_id, cstm_id,  con_id,  pay_type, item_id, pay_line_id, 
+    		sk_date, sk_value, achivement, 
+    		status, kcgw_name,  memo,   creator_id, created_at, updated_at)
+    values (
+          #{companyId}, #{cstmId}, #{conId}, #{payType}, #{itemId}, #{payLineId}, 
+          #{skDate},    #{skValue},  #{achivement},
+          #{status},    #{kcgwName},  #{memo}, #{creatorId}, now(), now() )
+  </insert>
+  
+  <update id="update" parameterType="com.niu.crm.model.CustContractSk" >
+    update t_cust_contract_sk
+       set sk_date=#{skDate},
+           item_id = #{itemId}, 
+       	   sk_value= #{skValue}, 
+       	   achivement = #{achivement},
+       	   pay_type= #{payType}, 
+           memo = #{memo}
+     where id = #{id}
+  </update>
+  
+  <update id="updateAchivement" parameterType="com.niu.crm.model.CustContractSk" >
+    update t_cust_contract_sk
+       set achivement = #{achivement}
+     where id = #{id}
+  </update>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from t_cust_contract_sk where id = #{id} and status !='AUDIT'
+  </delete>
+  
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_cust_contract_sk c
+    where id = #{id}
+  </select>
+  
+  <select id="selectByPayLineId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_cust_contract_sk c
+    where pay_line_id = #{payLineId}
+  </select>
+  
+  <select id="selectByPayId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_cust_contract_sk c
+    where exists (select id from t_payment_line a where c.id=c.pay_line_id and a.pay_id= #{payId})
+  </select>
+  
+  <select id="selectByConId" resultMap="VOResultMap" >
+    select 
+        sk.id, sk.company_id, sk.cstm_id, sk.con_id, sk.sk_date, sk.item_id, sk.pay_type,
+        sk.sk_value, sk.achivement,sk.status, sk.kcgw_name, sk.memo, sk.creator_id, sk.created_at,
+        dict.dict_name item_name
+      from t_cust_contract_sk sk, t_dict dict
+     where sk.item_id=dict.id and sk.con_id = #{conId}
+     order by sk.sk_date asc, sk.id 
+  </select> 
+  
+  <sql id="queryClause">
+  	 from t_cust_contract_sk sk left outer join t_cust_contract cc on sk.con_id = cc.id 
+  	       left outer join t_lx_contract c on sk.con_id = c.con_id, t_customer a, t_lx_customer stu 
+    where a.id=sk.cstm_id and a.id = stu.cstm_id
+    <if test="params.companyId != null" >
+      and sk.company_id = #{params.companyId}
+    </if>
+    <if test="params.conNo != null and params.conNo != '' " >
+      and cc.con_no like  #{params.conNo}
+    </if>
+    
+    <if test="params.stuFromCode != null and params.stuFromCode != '' " >
+      and exists (
+        select * from t_dict dict 
+         where id=stu.stu_from_id and dict.dict_code like #{params.stuFromCode}
+      )
+    </if>
+    
+    <if test="params.conTypeCodes != null " >
+      and exists (
+        select * from t_dict dict 
+         where id=c.con_type and 
+       <foreach collection="params.conTypeCodes" index="index" item="item" open="(" separator="or" close=")">  
+	       dict.dict_code like concat(#{item},'%')
+	   </foreach>
+      )
+    </if>
+    <if test="params.itemId != null " >
+      and sk.item_id = #{params.itemId}
+    </if>
+    <if test="params.itemCode != null and params.itemCode != '' " >
+      and exists (
+         select * from t_dict dict  
+          where id = sk.item_id and dict_code like #{params.itemCode}
+      ) 
+    </if>
+    <if test="params.signGwId != null " >
+      and c.sign_gw_id =  #{params.signGwId}
+    </if>
+    <if test="params.planGwId != null " >
+      and c.plan_gw_id =  #{params.planGwId}
+    </if>
+    <if test="params.applyGwId != null " >
+      and c.apply_gw_id =  #{params.applyGwId}
+    </if>
+    <if test="params.writeGwId != null " >
+      and c.write_gw_id =  #{params.writeGwId}
+    </if>
+    <if test="params.serviceGwId != null " >
+      and c.service_gw_id =  #{params.serviceGwId}
+    </if>
+    <if test="params.conId != null " >
+      and sk.con_id =  #{params.conId}
+    </if>
+    <if test="params.cstmName != null" >
+      and a.name like  #{params.cstmName}
+    </if>
+    <if test="params.skDateFrom != null" >
+      and sk.sk_date &gt;=  #{params.skDateFrom}
+    </if>
+    <if test="params.skDateTo != null" >
+      and sk.sk_date &lt;=  #{params.skDateTo}
+    </if>
+    <if test="params.status != null" >
+      and sk.status =  #{params.status}
+    </if>
+    
+    <if test="params.aclClause != null and params.aclClause !='' " >
+      ${params.aclClause}
+    </if>
+  </sql>
+  
+  <select id="queryStat" resultMap="VOResultMap" >
+    select sum(sk.sk_value) as sk_value, sum(sk.achivement) as achivement
+    <include refid="queryClause"/>
+  </select> 
+  
+  <select id="statContractFirstSkDate" resultType="Date">
+    select min(sk_date) from t_cust_contract_sk where con_id= #{conId}
+  </select> 
+  
+  <select id="statContractSkAmount" resultType="BigDecimal">
+    select ifnull(sum(sk_value),0) from t_cust_contract_sk where con_id= #{conId}
+  </select> 
+  
+  <select id="countSk" resultType="Integer">
+    select count(*) 
+    <include refid="queryClause"/>
+  </select>
+  
+  <select id="querySk" resultMap="VOResultMap" >
+    select 
+      a.name as cstm_name, stu.stu_from_id, 
+      sk.id, sk.company_id, sk.cstm_id, sk.con_id, sk.sk_date, sk.item_id, sk.pay_type,
+      sk.sk_value, sk.achivement,sk.status, sk.kcgw_name, sk.memo, sk.creator_id, sk.created_at, sk.updated_at,
+      cc.con_no, c.con_type, c.country_codes, c.country_names, c.plan_enter_year, c.plan_enter_season,
+      c.sign_gw_id, c.plan_gw_id, c.apply_gw_id, c.write_gw_id
+    <include refid="queryClause"/>
+    <if test="pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager.sort ==null">
+		order by sk.created_at desc
+	</if>		
+	limit #{pager.offset}, #{pager.size}
+  </select> 
+</mapper>  

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.UserFuncMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.vo.UserFuncVO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="func_id" property="funcId" jdbcType="BIGINT" />
+    <result column="func_code" property="funcCode" jdbcType="VARCHAR" />
+    <result column="func_name" property="funcName" jdbcType="VARCHAR" />
+    <result column="acl_scope" property="aclScope" jdbcType="VARCHAR" />
+    <result column="company_ids" property="companyIds" jdbcType="VARCHAR" />
+    <result column="unit_ids" property="unitIds" jdbcType="VARCHAR" />
+    <result column="from_ids" property="fromIds" jdbcType="VARCHAR" />
+    <result column="clause" property="clause" jdbcType="VARCHAR" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.UserFunc" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_userfunc(
+    	func_id, user_id, acl_scope, from_ids, unit_ids, company_ids, 
+    	clause,creator_id, created_at
+    )values(
+       #{funcId}, #{userId}, #{aclScope}, #{fromIds}, #{unitIds}, #{companyIds}, 
+       #{clause}, #{creatorId}, now()
+    )
+  </insert>
+  
+  <delete id="delete" >
+    delete from t_userfunc where user_id = #{userId} and func_id= #{funcId}
+  </delete>
+  
+  <delete id="deleteByUserId" >
+    delete from t_userfunc where user_id = #{userId} 
+  </delete>
+  
+  <sql id="queryClause">
+  	  from t_userfunc a, t_func b
+     where a.func_id = b.id
+    
+    <if test="params.userId != null " >
+      and a.user_id = #{params.userId}
+    </if>
+    <if test="params.funcId != null " >
+      and a.func_id = #{params.funcId}
+    </if>
+    <if test="params.funcCode != null and params.funcCode != '' " >
+      and b.code = lower(#{params.funcCode})
+    </if>
+  </sql>  
+  
+  <select id="queryUserFunc" resultMap="BaseResultMap">
+    select 
+    	   a.id, a.func_id, a.user_id, b.code as func_code, b.name as func_name,
+    	   a.acl_scope, a.from_ids, a.unit_ids, a.company_ids, a.clause, 
+    	   a.created_at, a.creator_id
+    <include refid="queryClause"/>
+    order by a.user_id, b.show_index, b.code
+  </select> 
+  
+  <delete id="deleteByFuncId" >
+    delete from t_userfunc where func_id= #{funcId}
+  </delete>
+  
+  <select id="selectAll" resultMap="BaseResultMap" >    
+    select 
+    	   a.id, a.func_id, a.user_id, b.code as func_code, b.name as func_name, 
+    	   a.acl_scope, a.from_ids, a.unit_ids, a.company_ids,  a.clause,  a.created_at, a.creator_id
+      from t_userfunc a, t_func b
+     where a.func_id = b.id and a.user_id = #{userId}
+  </select>     
+</mapper>  

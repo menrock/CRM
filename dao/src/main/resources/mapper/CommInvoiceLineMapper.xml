@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CommInvoiceLineMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.CommInvoiceLine" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="inv_id" property="invId" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+    <result column="contract_id" property="contractId" jdbcType="BIGINT" />
+    <result column="stu_name" property="stuName" jdbcType="VARCHAR" />
+    <result column="stu_birth" property="stuBirth" jdbcType="VARCHAR" />
+    <result column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <result column="course_term" property="courseTerm" jdbcType="VARCHAR" />
+    <result column="course_fee" property="courseFee" jdbcType="DECIMAL" />
+    <result column="comm_ratio" property="commRatio" jdbcType="DECIMAL" />
+    <result column="comm_amount" property="commAmount" jdbcType="DECIMAL" />
+    <result column="last_one" property="lastOne" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, inv_id, company_id, contract_id, stu_name, stu_birth, course_name, course_term, 
+    course_fee, comm_ratio, comm_amount, last_one, memo
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.CommInvoiceLine" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into comm_invoice_line (
+        inv_id,     company_id, contract_id, stu_name, stu_birth, course_name, course_term, 
+        course_fee, comm_ratio, comm_amount, last_one, memo
+    )
+    values (
+       #{invId},  #{companyId}, #{contractId}, #{stuName}, #{stuBirth}, #{courseName}, #{courseTerm}, 
+       #{courseFee}, #{commRatio}, #{commAmount}, #{lastOne}, #{memo}
+    )
+  </insert>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  	select <include refid="Base_Columns" />
+      from comm_invoice_line
+     where id = #{id}
+  </select>
+  
+  <select id="selectByInvId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  	select <include refid="Base_Columns" />
+      from comm_invoice_line
+     where inv_id = #{invId}
+  </select>
+    
+  <update id="update" parameterType="com.niu.crm.model.CommInvoiceLine" >
+    update comm_invoice_line
+       set company_id  = #{companyId},  contract_id = #{contractId}, 
+           stu_name    = #{stuName},    stu_birth   = #{stuBirth}, 
+           course_name = #{courseName}, course_term = #{courseTerm}, 
+           course_fee  = #{courseFee},  comm_ratio  = #{commRatio}, 
+           comm_amount = #{commAmount}, last_one = #{lastOne}, 
+           memo = #{memo}
+     where id = #{id}
+  </update>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from comm_invoice_line where id = #{id}
+  </delete>
+  
+  <delete id="deleteByInvId" parameterType="java.lang.Long" >
+    delete from comm_invoice_line where inv_id = #{id}
+  </delete>
+  
+</mapper> 
+
+ 

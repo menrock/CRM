@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CountryMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.Country" >
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="name_abbr" property="nameAbbr" jdbcType="VARCHAR" />
+    <result column="show_index" property="showIndex" jdbcType="BIGINT" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    code, name, name_abbr, show_index
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.Country" >
+    insert into t_country
+     (code, name, name_abbr, show_index)
+    values (
+      upper(#{code}),  #{name}, #{nameAbbr}, #{showIndex}
+    )
+  </insert>
+  <update id="update" parameterType="com.niu.crm.model.Country" >
+    update t_country
+       set show_index = #{showIndex},
+           name = #{name},
+           name_abbr =#{nameAbbr}
+     where code = upper(#{code})
+  </update>
+  
+  <select id="selectByCode" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from t_country
+    where code = upper(#{code})
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from t_country
+      order by show_index, code
+  </select>
+</mapper>  

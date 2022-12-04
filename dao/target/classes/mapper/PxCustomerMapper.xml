@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.PxCustomerMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.PxCustomer" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="basic_info" property="basicInfo" jdbcType="VARCHAR" />
+    <result column="last_info" property="lastInfo" jdbcType="VARCHAR" />
+    <result column="visitor_type" property="visitorType" jdbcType="VARCHAR" />
+    <result column="inquire_date" property="inquireDate" jdbcType="DATE" />
+    <result column="visit_date" property="visitDate" jdbcType="DATE" />
+    <result column="stu_from_id" property="stuFromId" jdbcType="BIGINT" />
+    <result column="gpa" property="gpa" jdbcType="VARCHAR" />
+    
+    <result column="fl_toefl" property="flToefl" jdbcType="VARCHAR" />
+    <result column="fl_toefl_junior" property="flToeflJunior" jdbcType="VARCHAR" />
+    <result column="fl_ielts" property="flIelts" jdbcType="VARCHAR" />
+    <result column="fl_gre" property="flGre" jdbcType="VARCHAR" />
+    <result column="fl_gmat" property="flGmat" jdbcType="VARCHAR" />
+    <result column="fl_sat" property="flSat" jdbcType="VARCHAR" />
+    <result column="fl_sat2" property="flSat2" jdbcType="VARCHAR" />
+    <result column="fl_ssat" property="flSsat" jdbcType="VARCHAR" />
+    <result column="fl_act" property="flAct" jdbcType="VARCHAR" />
+    
+    <result column="current_specialty" property="currentSpecialty" jdbcType="VARCHAR" />
+    <result column="hope_specialty" property="hopeSpecialty" jdbcType="VARCHAR" />
+    <result column="curr_school" property="currSchool" jdbcType="VARCHAR" />
+    <result column="curr_grade" property="currGrade" jdbcType="VARCHAR" />
+    <result column="stu_xl" property="stuXl" jdbcType="VARCHAR" />
+    <result column="plan_country" property="planCountry" jdbcType="VARCHAR" />
+    <result column="plan_xl" property="planXl" jdbcType="VARCHAR" />
+    <result column="plan_enter_year" property="planEnterYear" jdbcType="VARCHAR" />
+    <result column="plan_enter_season" property="planEnterSeason" jdbcType="VARCHAR" />
+    <result column="zxgw_names" property="zxgwNames" jdbcType="VARCHAR" />
+    <result column="stu_city" property="stuCity" jdbcType="VARCHAR" />
+    <result column="to_city" property="toCity" jdbcType="VARCHAR" />
+    <result column="to_city_id" property="toCityId" jdbcType="BIGINT" />
+    <result column="call_center" property="callCenter" jdbcType="VARCHAR" />
+    <result column="contact_count" property="contactCount" jdbcType="INTEGER" />
+    <result column="first_assign_date" property="firstAssignDate" jdbcType="TIMESTAMP" />
+    <result column="stu_level" property="stuLevel" jdbcType="BIGINT" />
+    <result column="last_contact_date" property="lastContactDate" jdbcType="TIMESTAMP" />
+    <result column="sign_date" property="signDate" jdbcType="TIMESTAMP" />
+    <result column="unit_id" property="unitId" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+    <result column="owner_id" property="ownerId" jdbcType="BIGINT" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+    <result column="archive" property="archive" jdbcType="BIT" />
+  </resultMap>
+  
+  <resultMap id="VOResultMap" type="com.niu.crm.vo.PxCustomerVO" extends="BaseResultMap">
+    <association property="customer" javaType="com.niu.crm.model.Customer" >
+    	<id property="id" column="cstm_id"/>
+    	<result column="name" property="name" jdbcType="VARCHAR" />
+    	<result column="gender" property="gender" jdbcType="VARCHAR" />
+    	<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    	<result column="phone" property="phone" jdbcType="VARCHAR" />
+    	<result column="email" property="email" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  <resultMap id="MyCustomerVOMap" type="com.niu.crm.vo.MyCustomerVO" extends="VOResultMap">
+    <association property="zxgw" javaType="com.niu.crm.model.StuZxgw" >
+    	<id property="id" column="zxgw_assign_id"/>
+    	<result column="zxgw_stu_level" property="stuLevel" jdbcType="BIGINT" />
+    	<result column="zxgw_assign_date" property="assignDate" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, cstm_id, inquire_date, visit_date, visitor_type, gpa, current_specialty, hope_specialty,
+    stu_from_id, curr_school, curr_grade, 
+    fl_toefl, fl_toefl_junior, fl_ielts, fl_gre, fl_gmat, fl_sat, fl_sat2, fl_ssat, fl_act,
+    stu_xl, plan_country,plan_xl, plan_enter_year,plan_enter_season, zxgw_names, 
+    stu_city, to_city, to_city_id, call_center, basic_info, last_info, 
+    contact_count, last_contact_date, sign_date, memo,
+    unit_id,company_id, owner_id, creator_id, created_at, updated_at, archive
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.PxCustomer" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_px_customer (cstm_id, basic_info, last_info, visitor_type, inquire_date, visit_date, gpa, current_specialty, hope_specialty,
+        stu_from_id, stu_xl, curr_school, curr_grade,  plan_country, 
+        plan_xl,  plan_enter_year, plan_enter_season,  call_center, stu_city,  to_city, to_city_id,
+        fl_toefl, fl_toefl_junior,  fl_ielts,  fl_gre, fl_gmat,  
+        fl_sat,   fl_sat2,          fl_ssat,   fl_act, 
+        unit_id,  company_id, memo, 
+        owner_id, creator_id, created_at, updated_at)
+       values (#{cstmId}, #{basicInfo}, #{lastInfo},  #{visitorType}, #{inquireDate}, #{visitDate}, #{gpa}, #{currentSpecialty}, #{hopeSpecialty},
+        #{stuFromId}, #{stuXl}, #{currSchool}, #{currGrade}, #{planCountry},
+        #{planXl},  #{planEnterYear}, #{planEnterSeason}, #{callCenter}, #{stuCity}, #{toCity}, #{toCityId},
+        #{flToefl},  #{flToeflJunior}, #{flIelts}, #{flGre}, #{flGmat}, 
+        #{flSat},  #{flSat2}, #{flSsat}, #{flAct}, 
+        #{unitId}, #{companyId}, #{memo},    
+        #{ownerId}, #{creatorId}, #{createdAt}, #{updatedAt} )
+  </insert>
+  
+  <update id="update" parameterType="com.niu.crm.model.PxCustomer" >
+    update t_px_customer
+       set visitor_type = #{visitorType},
+           inquire_date = #{inquireDate},
+           visit_date = #{visitDate},
+           stu_from_id = #{stuFromId},
+           gpa = #{gpa},
+           fl_toefl = #{flToefl},
+           fl_toefl_junior = #{flToeflJunior},
+           fl_ielts = #{flIelts},
+           fl_gre = #{flGre},
+           fl_gmat = #{flGmat},
+           fl_sat = #{flSat},
+           fl_sat2 = #{flSat2},
+           fl_ssat = #{flSsat},
+           fl_act = #{flAct},
+           current_specialty = #{currentSpecialty},
+           hope_specialty = #{hopeSpecialty},
+           stu_xl = #{stuXl},
+           curr_school = #{currSchool},
+           curr_grade = #{currGrade},
+           plan_country = #{planCountry},
+           plan_xl = #{planXl},
+           plan_enter_year = #{planEnterYear},
+           plan_enter_season = #{planEnterSeason},
+           basic_info = #{basicInfo},
+           stu_city = #{stuCity},
+           to_city = #{toCity},
+           call_center = #{callCenter},
+           unit_id = #{unitId},
+           company_id = #{companyId},
+           owner_id = #{ownerId},
+           memo = #{memo},
+           updated_at = now()
+    where id = #{id}
+  </update>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.niu.crm.model.PxCustomer" >
+    update t_px_customer
+    <set >
+      <if test="cstmId != null" >
+        cstm_id = #{cstmId,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorType != null" >
+        visitor_type = #{visitorType},
+      </if>
+      <if test="inquireDate != null" >
+        inquire_date = #{inquireDate},
+      </if>
+      <if test="visitDate != null" >
+        visit_date = #{visitDate},
+      </if>
+      <if test="stuFromId != null" >
+      	stu_from_id = #{stuFromId}, 
+      </if>
+      <if test="gpa != null" >
+        gpa = #{gpa},
+      </if>
+      <if test="flToefl != null" >
+        fl_toefl = #{flToefl},
+      </if>
+      <if test="flToeflJunior != null" >
+        fl_toefl_junior = #{flToeflJunior},
+      </if>
+      <if test="flIelts != null" >
+        fl_ielts = #{flIelts},
+      </if>
+      <if test="flGre != null" >
+        fl_gre = #{flGre},
+      </if>
+      <if test="flGmat != null" >
+        fl_gmat = #{flGmat},
+      </if>
+      <if test="flSat != null" >
+        fl_sat = #{flSat},
+      </if>
+      <if test="flSat2 != null" >
+        fl_sat2 = #{flSat2},
+      </if>
+      <if test="flSsat != null" >
+        fl_ssat = #{flSsat},
+      </if>
+      <if test="flAct != null" >
+        fl_act = #{flAct},
+      </if>
+      
+      <if test="currentSpecialty != null" >
+        current_specialty = #{currentSpecialty},
+      </if>
+      <if test="hopeSpecialty != null" >
+        hope_specialty = #{hopeSpecialty},
+      </if>
+      <if test="stuXl != null" >
+        stu_xl = #{stuXl},
+      </if>
+      <if test="currSchool != null" >
+        curr_school = #{currSchool},
+      </if>   
+      <if test="currGrade != null" >
+        curr_grade = #{currGrade},
+      </if>     
+      <if test="planCountry != null" >
+        plan_country = #{planCountry},
+      </if>
+      <if test="planXl != null" >
+        plan_xl = #{planXl},
+      </if>
+      <if test="planEnterYear != null" >
+        plan_enter_year = #{planEnterYear},
+      </if>
+      <if test="planEnterSeason != null" >
+        plan_enter_season = #{planEnterSeason},
+      </if>
+      <if test="basicInfo != null" >
+        basic_info = #{basicInfo},
+      </if>
+      <if test="lastInfo != null" >
+        last_info = #{lastInfo},
+      </if>
+      <if test="stuCity != null" >
+        stu_city = #{stuCity},
+      </if>
+      <if test="toCity != null" >
+        to_city = #{toCity},
+      </if>
+      <if test="callCenter != null" >
+        call_center = #{callCenter},
+      </if>
+      <if test="zxgwNames != null" >
+        zxgw_names = #{zxgwNames},
+      </if>
+      <if test="lastContactDate != null" >
+        last_contact_date = #{lastContactDate},
+      </if>
+      <if test="stuLevel != null" >
+        stu_level = #{stuLevel},
+      </if>
+      <if test="firstAssignDate != null" >
+        first_assign_date = #{firstAssignDate},
+      </if>
+      
+      <if test="unitId != null" >
+        unit_id = #{unitId},
+      </if>
+      <if test="ownerId != null" >
+        owner_id = #{ownerId},
+      </if>
+      <if test="companyId != null" >
+        company_id = #{companyId},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo},
+      </if>
+      updated_at = now()
+    </set>
+    where id = #{id}
+  </update>
+  
+  <update id="updateSignDate" parameterType="com.niu.crm.model.PxCustomer" >
+    update t_px_customer
+       set sign_date = #{signDate},   updated_at = now()
+     where cstm_id = #{cstmId}
+  </update>
+  
+  <update id="updateContactDate" >
+    update t_px_customer a
+       set contact_count =#{contactCount},
+       	   last_contact_date=#{lastContactDate}
+     where id = #{id}
+  </update>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from t_px_customer where id = #{id}
+  </delete>
+  
+  <select id="selectCstmIdById" resultType="Long" parameterType="java.lang.Long" >
+    select cstm_id from t_px_customer where id = #{id}
+  </select>
+  
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_px_customer
+    where id = #{id}
+  </select>
+  
+  <select id="selectByCstmId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from t_px_customer
+    where cstm_id = #{cstmId}
+  </select>
+  
+  <sql id="queryClause">
+  	from t_px_customer a left outer join t_dict dict on a.stu_from_id=dict.id, t_customer c
+    where a.cstm_id=c.id and a.archive=false and c.archive=false
+    <if test="params.company_id != null" >
+      and a.company_id = #{params.company_id}
+    </if>
+    <if test="params.stuFromCode != null" >
+      and (dict.dict_code = #{params.stuFromCode} or dict.dict_code like concat(#{params.stuFromCode},'.%') )
+    </if>
+    <if test="params.stuFromIds != null and params.stuFromIds.length >0" >
+		and a.stu_from_id in 
+		<foreach collection="params.stuFromIds" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.unitCode != null" >
+		and exists( 
+		 select * from t_px_stu_zxgw zxgw, t_user user, t_unit unit
+		  where zxgw.stu_id=a.id and zxgw.zxgw_id=user.id and user.unit_id=unit.id 
+		    and ( unit.code =#{params.unitCode} or unit.code like concat(#{params.unitCode},'%') )
+       )
+    </if>
+    <if test="params.zxgwList != null" >
+		and exists( select * from t_px_stu_zxgw where stu_id=a.id and zxgw_id in
+		<foreach collection="params.zxgwList" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+       )
+    </if>
+    <if test="params.zxgwList ==null and params.assignFlag != null and params.assignFlag " >
+      and exists(select * from t_px_stu_zxgw where stu_id=a.id )
+    </if>   
+    <if test="params.zxgwList ==null and params.assignFlag != null and !params.assignFlag " >
+      and not exists(select * from t_px_stu_zxgw where stu_id=a.id )
+    </if> 
+    <if test="params.owner_id != null" >
+      and a.owner_id = #{params.owner_id}
+    </if>
+    <if test="params.creator_id != null" >
+      and a.creator_id = #{params.creator_id}
+    </if>
+    <if test="params.name != null and params.name !='' " >
+      and c.name like #{params.name}
+    </if>
+    <if test="params.gender != null and params.gender !='' " >
+      and c.gender = #{params.gender}
+    </if>
+    <if test="params.mobile != null and params.mobile !='' " >
+      and c.mobile like #{params.mobile}
+    </if>
+    <if test="params.phone != null and params.phone !='' " >
+      and (c.mobile like #{params.phone} or c.phone like #{params.phone})
+    </if>
+    <if test="params.visitor_type != null and params.visitor_type !='' " >
+      and a.visitor_type = #{params.visitor_type}
+    </if>
+	<if test="params.stu_level != null" >
+		and a.stu_level in 
+		<foreach collection="params.stu_level" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+	
+    <if test="params.country_codes != null" >
+		and exists (select * from t_stu_plan_country where stu_id=a.id and country_code in 
+		<foreach collection="params.country_codes" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>)
+	</if>
+	<if test="params.plan_xl != null" >
+		and a.plan_xl in 
+		<foreach collection="params.plan_xl" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.curr_school != null " >
+      and a.curr_school like concat('%',#{params.curr_school},'%')
+    </if>
+    <if test="params.school_input_flag != null and params.visitor_type =='1' " >
+      and a.curr_school is not null
+    </if>
+    <if test="params.school_input_flag != null and params.visitor_type =='0' " >
+      and a.curr_school is null
+    </if>
+    <if test="params.inquire_from != null " >
+      and a.inquire_date &gt;= #{params.inquire_from}
+    </if>
+    <if test="params.inquire_to != null " >
+      and a.inquire_date &lt; date_add(#{params.inquire_to}, interval 1 day)
+    </if>
+    <if test="params.visit_from != null " >
+      and a.visit_date &gt;= #{params.visit_from}
+    </if>
+    <if test="params.visit_to != null " >
+      and a.visit_date &lt; date_add(#{params.visit_to}, interval 1 day)
+    </if>
+    <if test="params.created_from != null " >
+      and a.created_at &gt;= #{params.created_from}
+    </if>
+    <if test="params.created_to != null " >
+      and a.created_at &lt; date_add(#{params.created_to}, interval 1 day)
+    </if>
+    
+    <if test="params.last_contact_from != null " >
+      and a.last_contact_date &gt;= #{params.last_contact_from}
+    </if>
+    <if test="params.last_contact_to != null " >
+      and a.last_contact_date &lt; date_add(#{params.last_contact_to}, interval 1 day)
+    </if>
+    <if test="params.contactCountMin != null " >
+      and a.contact_count &gt;= #{params.contactCountMin}
+    </if>
+    <if test="params.contactCountMax != null " >
+      and a.contact_count &lt;= #{params.contactCountMax}
+    </if>
+    
+    <if test="params.planEnterYear != null " >
+      and a.plan_enter_year = #{params.planEnterYear}
+    </if>
+    
+    <if test="params.planEnterSeason != null and params.planEnterSeason !='' " >
+      and a.plan_enter_season = #{params.planEnterSeason}
+    </if>
+    
+    <if test="params.signFlag != null and params.signFlag " >
+      and a.sign_date is not null
+    </if>   
+    <if test="params.signFlag != null and !params.signFlag " >
+      and a.sign_date is null
+    </if> 
+    
+    <if test="params.exclude_ids != null and params.exclude_ids !='' " >
+      and a.id not in (${params.exclude_ids})
+    </if>
+    
+    <if test="params.aclClause != null and params.aclClause !='' " >
+      ${params.aclClause}
+    </if>
+  </sql>  
+  
+  <select id="countStudents" resultType="Integer">
+    select count(*) 
+    <include refid="queryClause"/>
+  </select>
+  
+  <select id="queryStudents" resultMap="VOResultMap" >
+    select 
+      a.id, a.cstm_id, a.inquire_date, a.visit_date, a.gpa, a.current_specialty, a.hope_specialty,
+      a.first_assign_date, a.stu_level, a.stu_xl, a.curr_school, a.curr_grade, a.plan_country, a.plan_xl, 
+      a.plan_enter_year, a.plan_enter_season, a.stu_from_id, a.zxgw_names,  
+      a.contact_count, a.last_contact_date, a.stu_city, a.unit_id, a.company_id, 
+      c.name, c.gender, c.mobile, c.email, a.owner_id, a.creator_id, a.created_at
+    <include refid="queryClause"/>
+    
+    <if test="pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager.sort ==null">
+		order by a.created_at desc
+	</if>		
+	limit #{pager.offset}, #{pager.size}
+  </select>
+  
+  <select id="queryRepeat" resultMap="VOResultMap" >
+    select 
+      	a.id, a.cstm_id, a.inquire_date, a.visit_date, a.gpa, a.current_specialty, a.hope_specialty,
+      	a.stu_level, a.stu_xl, a.curr_school, a.curr_grade, a.plan_country, a.plan_xl, 
+      	a.plan_enter_year, a.plan_enter_season, a.stu_from_id, 
+      	a.last_contact_date, a.unit_id, a.company_id, 
+      	c.name, c.gender, c.mobile, c.phone, c.email, a.created_at, a.creator_id
+      from t_px_customer a , t_customer c
+    where a.cstm_id=c.id and a.archive=false and c.archive=false
+      and exists (
+        select * from t_cust_phone where cstm_id=c.id and phone in
+		<foreach collection="phones" index="index" item="phone" open="(" separator="," close=")">  
+	       #{phone}
+	   </foreach>
+      )
+    <if test="excludeCstmId != null and excludeCstmId !='' " >
+      and a.cstm_id != #{excludeCstmId}
+    </if>
+	limit 5
+  </select> 
+  
+  <update id="changeCompany" >
+    update t_px_customer set company_id=#{toCompanyId} where company_id=#{fromCompanyId}
+  </update> 
+  <update id="changeUnit" >
+    update t_px_customer set unit_id=#{toUnitId} where unit_id=#{fromUnitId}
+  </update> 
+  
+  <update id="changeStufrom" >
+    update t_px_customer set stu_from_id=#{toId} where stu_from_id=#{fromId}
+  </update> 
+</mapper>  

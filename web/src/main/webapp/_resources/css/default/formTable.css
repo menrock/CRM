@@ -1,0 +1,27 @@
+.formTable{ 
+  border-collapse: collapse; 
+  border-left:1px solid #008d93;
+  border-top:1px solid #008d93;
+} 
+
+.formTable tr{}
+.formTable tr.hd td, th
+{
+	overflow:hidden;
+	padding-right:2px;
+	text-align: right;
+	background-color:#e5f3f4;
+	vertical-align:middle;
+	font-size:9pt;color:#333;font-weight:bold;
+	border-style:solid;border-color:#008d93;border-width:0 1px 1px 0
+}
+
+.formTable td 
+{
+	height:30px;
+	padding-left:2px;
+	padding:0 1px;overflow:hidden;
+	background-color:#fff;
+	font-size:9pt;
+	border-bottom:1px solid #008d93;border-right:1px solid #008d93;
+}

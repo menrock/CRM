@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.StuSingleShareMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.StuSingleShare" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="stu_id" property="stuId" jdbcType="BIGINT" />
+    <result column="from_user_id" property="fromUserId" jdbcType="BIGINT" />
+    <result column="to_user_id" property="toUserId" jdbcType="BIGINT" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, stu_id, from_user_id, to_user_id, creator_id, created_at
+  </sql>
+  
+  <select id="selectById" resultMap="BaseResultMap" >
+    select 
+    	<include refid="Base_Columns"/>
+    from t_stu_single_share
+    where id=#{id}
+  </select>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.StuShare" >
+    insert into t_stu_single_share
+     (stu_id, from_user_id, to_user_id, creator_id, created_at)
+    values (
+      #{stuId}, #{fromUserId}, #{toUserId},  #{creatorId},  now()
+    )
+  </insert>
+  
+  <delete id="delete" >
+    delete from t_stu_single_share where id = #{id}
+  </delete>
+  
+  <sql id="queryClause">
+  	from t_stu_single_share a
+    where 1=1
+    <if test="params.stuId != null" >
+      and a.stu_id = #{params.stuId}
+    </if>
+    <if test="params.fromUserId != null" >
+      and a.from_user_id = #{params.fromUserId}
+    </if>
+    <if test="params.toUserId != null" >
+      and a.to_user_id = #{params.toUserId}
+    </if>
+    <if test="params.creatorId != null" >
+      and a.creator_id = #{params.creatorId}
+    </if>
+    <if test="params.created_from != null " >
+      and a.created_at &gt;= #{params.created_from}
+    </if>
+    <if test="params.created_to != null " >
+      and a.created_at &lt; date_add(#{params.created_to}, interval 1 day)
+    </if>
+  </sql>  
+  
+  <select id="countShare" resultType="Integer">
+    select count(*) 
+    <include refid="queryClause"/>
+  </select>
+  
+  <select id="queryShare" resultMap="BaseResultMap" >
+    select 
+      a.id, a.from_user_id, a.to_user_id, a.creator_id, a.created_at
+    <include refid="queryClause"/>
+    
+    <if test="pager !=null and pager.sort != null">
+		order by 
+		<foreach collection="pager.sort" item="order" index="index" open="" separator="" close="">
+		     ${order.property} ${order.direction}
+		</foreach>
+	</if>
+	<if test="pager ==null or pager.sort ==null">
+		order by a.created_at desc
+	</if>		
+	<if test="pager !=null">
+	limit #{pager.offset}, #{pager.size}
+	</if>			
+	<if test="pager ==null">
+	limit 1000
+	</if>			
+  </select>
+</mapper>  

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CustAttachMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.CustAttach" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="con_id" property="conId" jdbcType="BIGINT" />
+    <result column="attach_type" property="attachType" jdbcType="VARCHAR" />
+    <result column="attach_name" property="attachName" jdbcType="VARCHAR" />
+    <result column="attach_desc" property="attachDesc" jdbcType="VARCHAR" />
+    <result column="file_ext" property="fileExt" jdbcType="VARCHAR" />
+    <result column="oss_key" property="ossKey" jdbcType="VARCHAR" />
+    <result column="creator_id" property="creatorId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  
+  <sql id="Base_Columns" >
+    id, cstm_id, con_id, attach_type, attach_name, attach_desc, file_ext, oss_key, creator_id, created_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.CustAttach" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_cust_attach (
+    		cstm_id, con_id, attach_type, attach_name, attach_desc, 
+    		file_ext, oss_key, creator_id, created_at
+    )
+    values (
+       #{cstmId},  #{conId},  #{attachType}, #{attachName},  #{attachDesc}, 
+       #{fileExt}, #{ossKey}, #{creatorId}, now() 
+    )
+  </insert>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    from t_cust_attach 
+    where id= #{id}
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from t_cust_attach where id = #{id}
+  </delete>
+  
+  <sql id="queryClause">
+  	from t_cust_attach a
+    where 1=1
+    <if test="params.cstmId != null" >
+      and a.cstm_id = #{params.cstmId}
+    </if>
+    <if test="params.conId != null" >
+      and a.con_id = #{params.conId}
+    </if>
+  </sql>  
+  
+  <select id="queryAttach" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Columns" />
+    <include refid="queryClause" />
+    order by created_at desc
+  </select>
+  
+  <select id="countAttach" resultType="Integer" >
+    select count(*)
+    <include refid="queryClause" />
+  </select>
+</mapper>  

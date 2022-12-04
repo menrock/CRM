@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.CustomerRecommendMapper" >
+  <resultMap id="BaseResultMap" type="com.niu.crm.model.CustomerRecommend" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="cstm_id" property="cstmId" jdbcType="BIGINT" />
+    <result column="from_biz" property="fromBiz" jdbcType="VARCHAR" />
+    <result column="to_biz" property="toBiz" jdbcType="VARCHAR" />
+    <result column="from_company_id" property="fromCompanyId" jdbcType="BIGINT" />
+    <result column="to_company_id" property="toCompanyId" jdbcType="BIGINT" />
+    <result column="from_gw_id" property="fromGwId" jdbcType="BIGINT" />
+    <result column="to_gw_id" property="toGwId" jdbcType="BIGINT" />
+    <result column="from_biz_cstm_id" property="fromBizCstmId" jdbcType="BIGINT" />
+    <result column="to_biz_cstm_id" property="toBizCstmId" jdbcType="BIGINT" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Columns" >
+    id, cstm_id, from_biz, to_biz, from_company_id, to_company_id, 
+    from_gw_id,  to_gw_id, from_biz_cstm_id, to_biz_cstm_id, created_at
+  </sql>
+  
+  <insert id="insert" parameterType="com.niu.crm.model.CustomerRecommend" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into customer_recommend (
+    	cstm_id,     from_biz, to_biz, from_company_id, to_company_id, 
+    	from_gw_id,  to_gw_id, from_biz_cstm_id, to_biz_cstm_id, created_at)
+    values (
+       #{cstmId}, #{fromBiz}, #{toBiz}, #{fromCompanyId}, #{toCompanyId}, 
+       #{fromGwId}, #{toGwId}, #{fromBizCstmId}, #{toBizCstmId}, now()
+    )
+  </insert>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Columns" />
+    from customer_recommend
+    where id = #{id}
+  </select>
+</mapper>  

@@ -1,0 +1,52 @@
+/* Õ®”√ */
+body,ul,ol,li,p,h1,h2,h3,h4,h5,h6,form,fieldset,table,td,img{margin:0;padding:0;border:0;}
+ul{list-style-type:none;}
+select,input{vertical-align:middle;}
+body{background:#fff;margin:5px;color:#000;}
+td,p,li,select,input,textarea,div{font-size:12px;}
+
+.f14{font-size:14px;}
+.lh21{line-height:21px;}
+
+a{text-decoration:underline;}
+a:link{color:#00f;}
+a:visited{color:#00f;}
+a:hover,a:active,a:focus{color:#cf2f0f;}
+
+.wrap{width:100%; margin:0 auto; overflow:hidden;}
+
+.clearit{clear:both;}
+
+/* MenuSwitch */
+#menuSwitch{width:14px; background:url(/images/default/newtree/stock_hq_ws_005.gif) repeat-y right; cursor:pointer;}
+#menuSwitch img{margin-right:3px;}
+
+/* Tree */
+.dtree {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #666;
+	white-space: nowrap;
+}
+.dtree img {
+	border: 0px;
+	vertical-align: middle;
+}
+.dtree a {
+	color: #333;
+	text-decoration: none;
+}
+.dtree a.node, .dtree a.nodeSel {
+	white-space: nowrap;
+	padding: 1px 2px 1px 2px;
+}
+.dtree a.node:hover, .dtree a.nodeSel:hover {
+	color: #333;
+	text-decoration: underline;
+}
+.dtree a.nodeSel {
+	background-color: #c0d2ec;
+}
+.dtree .clip {
+	overflow: hidden;
+}

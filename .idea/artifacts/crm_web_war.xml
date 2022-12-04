@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="crm-web:war">
+    <output-path>C:/Publish</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>crm-web</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="crm-web.war">
+      <element id="artifact" artifact-name="crm-web:war exploded" />
+    </root>
+  </artifact>
+</component>

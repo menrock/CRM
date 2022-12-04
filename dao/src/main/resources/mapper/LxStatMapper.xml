@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niu.crm.dao.mapper.LxStatMapper" > 
+  <select id="statResourceByFrom" resultType="HashMap">
+    select company_id, count(*) as qty
+      from t_lx_customer a left outer join t_dict dict on a.stu_from_id=dict.id
+     where 1=1
+    <if test="params.created_from != null " >
+      and a.created_at &gt;= #{params.created_from}
+    </if>
+    <if test="params.created_to != null " >
+      and a.created_at &lt; date_add(#{params.created_to}, interval 1 day)
+    </if> 
+    
+	<if test="params.stu_level != null" >
+		and a.stu_level in 
+		<foreach collection="params.stu_level" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.company_id != null" >
+      and a.company_id = #{params.company_id}
+    </if>
+    <if test="params.stuFromCode != null" >
+      and (dict.dict_code = #{params.stuFromCode} or dict.dict_code like concat(#{params.stuFromCode},'.%') )
+    </if>  
+    group by company_id
+    order by company_id
+  </select>
+  
+  <select id="statResourceByZxgw" resultType="HashMap">
+    select a.company_id, zxgw.zxgw_id, count(*) as qty
+      from t_lx_customer a left outer join t_dict dict on a.stu_from_id=dict.id, t_stu_zxgw zxgw
+     where a.id=zxgw.stu_id
+    <if test="params.created_from != null " >
+      and a.created_at &gt;= #{params.created_from}
+    </if>
+    <if test="params.created_to != null " >
+      and a.created_at &lt; date_add(#{params.created_to}, interval 1 day)
+    </if> 
+    <if test="params.assign_from != null " >
+      and zxgw.assign_date &gt;= #{params.assign_from}
+    </if>
+    <if test="params.assign_to != null " >
+      and zxgw.assign_date &lt; date_add(#{params.assign_to}, interval 1 day)
+    </if> 
+    
+    
+	<if test="params.stu_level != null" >
+		and zxgw.stu_level in 
+		<foreach collection="params.stu_level" index="index" item="item" open="(" separator="," close=")">  
+	       #{item}
+	   </foreach>
+	</if>
+    <if test="params.company_id != null" >
+      and a.company_id = #{params.company_id}
+    </if>
+    <if test="params.stuFromCode != null" >
+      and (dict.dict_code = #{params.stuFromCode} or dict.dict_code like concat(#{params.stuFromCode},'.%') )
+    </if>  
+    group by company_id, zxgw.zxgw_id
+    order by company_id
+      
+  </select>
+  
+  <select id="queryMarketStaffResource" resultType="HashMap">
+    select a.company_id, a.id stu_id, a.cstm_id, c.name as cstm_name, 
+           a.stu_from_id, a.owner_id, a.created_at
+      from t_lx_customer a, t_customer c
+     where a.cstm_id=c.id and owner_id is not null
+    <if test="params.createdFrom != null " >
+    	<![CDATA[
+      and a.created_at >= #{params.createdFrom}
+      ]]>
+    </if>
+    <if test="params.createdTo != null " >
+    	<![CDATA[
+      and a.created_at >= #{params.createdTo}
+      ]]>
+    </if> 
+    <if test="params.companyId != null " >
+      and a.company_id = #{params.companyId}
+    </if>    
+    <if test="params.stuFromId != null" >
+      and a.stu_from_id = #{params.stuFromId} 
+    </if>  
+    
+    
+	<if test="params.stuLevels != null" >
+		and exists (
+		   select * 
+		     from t_stu_zxgw zxgw 
+		    where stu_id=a.id and zxgw.stu_level in
+		    <foreach collection="params.stuLevels" index="index" item="item" open="(" separator="," close=")">  
+	           #{item}
+	        </foreach>
+		)
+	</if>
+    <if test="params.stuFromCode != null" >
+      and exists (
+		   select * from t_dict dict 
+		    where dict.id=a.stu_from_id and dict_code like concat(#{params.stuFromCode},'.%') )
+	  )
+    </if>  
+    order by a.created_at
+  </select>
+  
+</mapper>  
